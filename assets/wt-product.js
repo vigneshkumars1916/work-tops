@@ -5,9 +5,9 @@
   const cfgEl = root.querySelector('[data-wt-config]');
   const cfg = cfgEl ? JSON.parse(cfgEl.textContent) : { mtm: false, variants: [] };
   const form = root.querySelector('[data-wt-form]');
-  const fmt = new Intl.NumberFormat(cfg.locale || undefined, { style: 'currency', currency: cfg.currency || 'GBP' });
+  const fmt = new Intl.NumberFormat(cfg.locale || undefined, { style: 'currency', currency: cfg.currency || 'INR', currencyDisplay: 'narrowSymbol' });
   const money = (cents) => fmt.format(cents / 100);
-  const money0 = (cents) => new Intl.NumberFormat(cfg.locale || undefined, { style: 'currency', currency: cfg.currency || 'GBP', maximumFractionDigits: cents % 100 ? 2 : 0 }).format(cents / 100);
+  const money0 = (cents) => new Intl.NumberFormat(cfg.locale || undefined, { style: 'currency', currency: cfg.currency || 'INR', currencyDisplay: 'narrowSymbol', maximumFractionDigits: cents % 100 ? 2 : 0 }).format(cents / 100);
   const $ = (s, el = root) => el.querySelector(s);
 
   /* ---------- Gallery ---------- */

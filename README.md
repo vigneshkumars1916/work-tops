@@ -30,7 +30,8 @@ These live in the Shopify admin, not in the theme:
 
 | Where | What |
 | --- | --- |
-| Settings → General → Store defaults | Store currency (INR) |
+| Settings → General → Store defaults | Store currency INR, currency formatting `₹{{amount}}` |
+| Settings → General → Store address | Country set to India so the India market is the primary market |
 | Search & Discovery → Filters | Add **Colour** (product metafield `custom.colour`), **Finish** (product metafield `custom.finish`) and **Thickness** (variant option). Keep Price and Availability. |
 | Content → Metaobjects | `colour`, `finish`, `feature`, `testimonial` entries (already created) |
 | Products | Shopify's sample products (snowboards, ski wax, gift card) are set to Draft so they don't show on the storefront |
