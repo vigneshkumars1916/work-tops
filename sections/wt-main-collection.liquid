@@ -1,0 +1,219 @@
+{{ 'wt-collection.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'wt-collection.js' | asset_url }}" defer></script>
+{%- liquid
+  assign mult = section.settings.price_multiplier | default: 1
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign colours = shop.metaobjects.colour.values
+  assign active_total = 0
+  for f in collection.filters
+    assign active_total = active_total | plus: f.active_values.size
+    if f.type == 'price_range'
+      if f.min_value.value != nil or f.max_value.value != nil
+        assign active_total = active_total | plus: 1
+      endif
+    endif
+  endfor
+-%}
+<div class="wt-container wt-coll" data-wt-collection data-section-id="{{ section.id }}" data-mult="{{ mult }}">
+  <aside class="wt-facets" id="WtFacets" aria-label="{{ section.settings.filter_title | escape }}" data-wt-facets>
+    <form id="WtFilterForm" action="{{ collection.url }}" method="get" data-wt-filter-form>
+      <div class="wt-facets__head">
+        <h2 class="wt-facets__title">{% render 'wt-icon', icon: 'filter', size: 20 %}{{ section.settings.filter_title }}</h2>
+        {%- if active_total > 0 -%}<a class="wt-facets__clear" href="{{ collection.url }}?sort_by={{ sort_by }}" data-wt-ajax>{{ section.settings.clear_label }}</a>{%- endif -%}
+        <button type="button" class="wt-iconbtn wt-facets__close" data-wt-facets-close>{% render 'wt-icon', icon: 'close' %}<span class="wt-visually-hidden">{{ 'accessibility.close' | t }}</span></button>
+      </div>
+      {%- if active_total > 0 -%}
+        <div class="wt-active">
+          <p class="wt-active__label">{{ section.settings.active_label }}</p>
+          <ul class="wt-chips">
+            {%- for f in collection.filters -%}
+              {%- for v in f.active_values -%}
+                <li><a class="wt-chip" href="{{ v.url_to_remove }}" data-wt-ajax aria-label="Remove filter {{ v.label | escape }}">{{ v.label }}{% render 'wt-icon', icon: 'close' %}</a></li>
+              {%- endfor -%}
+              {%- if f.type == 'price_range' -%}
+                {%- if f.min_value.value != nil or f.max_value.value != nil -%}
+                  <li><a class="wt-chip" href="{{ f.url_to_remove }}" data-wt-ajax>{{ f.min_value.value | default: 0 | times: mult | money_without_trailing_zeros }} &ndash; {{ f.max_value.value | default: f.range_max | times: mult | money_without_trailing_zeros }}{% render 'wt-icon', icon: 'close' %}</a></li>
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- for f in collection.filters -%}
+        {%- liquid
+          assign key = f.param_name | handleize
+          assign lbl = f.label | downcase
+          assign is_colour = false
+          if lbl contains 'colour' or lbl contains 'color'
+            assign is_colour = true
+          endif
+        -%}
+        <div class="wt-facet" data-key="{{ key }}">
+          <h3 style="margin:0">
+            <button type="button" class="wt-facet__toggle" aria-expanded="true" aria-controls="Facet-{{ key }}" data-wt-facet-toggle>
+              {%- if f.type == 'price_range' -%}{{ section.settings.price_label | default: f.label }}{%- else -%}{{ f.label }}{%- endif -%}{% render 'wt-icon', icon: 'chevron-up' %}
+            </button>
+          </h3>
+          <div class="wt-facet__body" id="Facet-{{ key }}">
+            {%- case f.type -%}
+              {%- when 'list' -%}
+                {%- if is_colour -%}
+                  <fieldset style="border:0;margin:0;padding:0"><legend class="wt-visually-hidden">{{ f.label }}</legend>
+                  <ul class="wt-swatches">
+                    {%- for v in f.values -%}
+                      {%- liquid
+                        assign hex = v.swatch.color
+                        if hex == blank
+                          for co in colours
+                            if co.name.value == v.label
+                              assign hex = co.hex.value
+                              break
+                            endif
+                          endfor
+                        endif
+                      -%}
+                      <li>
+                        <label class="wt-swatch{% if v.count == 0 and v.active == false %} is-disabled{% endif %}" for="Filter-{{ key }}-{{ forloop.index }}">
+                          <input type="checkbox" id="Filter-{{ key }}-{{ forloop.index }}" name="{{ v.param_name }}" value="{{ v.value }}"{% if v.active %} checked{% endif %}{% if v.count == 0 and v.active == false %} disabled{% endif %}>
+                          <span class="wt-swatch__chip" style="--c: {{ hex | default: '#ddd' }}"></span>
+                          <span>{{ v.label }}</span>
+                          <span class="wt-swatch__count">({{ v.count }})</span>
+                        </label>
+                      </li>
+                    {%- endfor -%}
+                  </ul></fieldset>
+                {%- else -%}
+                  <fieldset style="border:0;margin:0;padding:0"><legend class="wt-visually-hidden">{{ f.label }}</legend>
+                  <ul class="wt-checks">
+                    {%- for v in f.values -%}
+                      <li><label class="wt-check" for="Filter-{{ key }}-{{ forloop.index }}">
+                        <input type="checkbox" id="Filter-{{ key }}-{{ forloop.index }}" name="{{ v.param_name }}" value="{{ v.value }}"{% if v.active %} checked{% endif %}{% if v.count == 0 and v.active == false %} disabled{% endif %}>
+                        <span>{{ v.label }} <span class="wt-check__count">({{ v.count }})</span></span>
+                      </label></li>
+                    {%- endfor -%}
+                  </ul></fieldset>
+                {%- endif -%}
+              {%- when 'boolean' -%}
+                <ul class="wt-checks">
+                  {%- for v in f.values -%}
+                    <li><label class="wt-check" for="Filter-{{ key }}-{{ forloop.index }}"><input type="checkbox" id="Filter-{{ key }}-{{ forloop.index }}" name="{{ v.param_name }}" value="{{ v.value }}"{% if v.active %} checked{% endif %}><span>{{ v.label }} <span class="wt-check__count">({{ v.count }})</span></span></label></li>
+                  {%- endfor -%}
+                </ul>
+              {%- when 'price_range' -%}
+                {%- liquid
+                  assign rmax = f.range_max | divided_by: 100.0 | times: mult | ceil
+                  if f.min_value.value != nil
+                    assign cur_min = f.min_value.value | divided_by: 100.0 | times: mult | floor
+                  else
+                    assign cur_min = 0
+                  endif
+                  if f.max_value.value != nil
+                    assign cur_max = f.max_value.value | divided_by: 100.0 | times: mult | ceil
+                  else
+                    assign cur_max = rmax
+                  endif
+                -%}
+                <div class="wt-price-range" data-wt-price data-max="{{ rmax }}">
+                  <div class="wt-range" aria-hidden="true">
+                    <span class="wt-range__track"></span><span class="wt-range__fill"></span>
+                    <input type="range" min="0" max="{{ rmax }}" step="1" value="{{ cur_min }}" data-range="min" tabindex="-1">
+                    <input type="range" min="0" max="{{ rmax }}" step="1" value="{{ cur_max }}" data-range="max" tabindex="-1">
+                  </div>
+                  <div class="wt-price-inputs">
+                    <label><span class="wt-visually-hidden">Minimum price ({{ cart.currency.symbol }})</span><input class="wt-input" type="number" inputmode="numeric" min="0" max="{{ rmax }}" value="{% if f.min_value.value != nil %}{{ cur_min }}{% endif %}" placeholder="{{ cart.currency.symbol }}0" data-price="min"></label>
+                    <span aria-hidden="true">&ndash;</span>
+                    <label><span class="wt-visually-hidden">Maximum price ({{ cart.currency.symbol }})</span><input class="wt-input" type="number" inputmode="numeric" min="0" max="{{ rmax }}" value="{% if f.max_value.value != nil %}{{ cur_max }}{% endif %}" placeholder="{{ cart.currency.symbol }}{{ rmax }}" data-price="max"></label>
+                  </div>
+                  <input type="hidden" name="{{ f.min_value.param_name }}" value="{% if f.min_value.value != nil %}{{ f.min_value.value | divided_by: 100.0 }}{% endif %}" data-price-param="min">
+                  <input type="hidden" name="{{ f.max_value.param_name }}" value="{% if f.max_value.value != nil %}{{ f.max_value.value | divided_by: 100.0 }}{% endif %}" data-price-param="max">
+                </div>
+            {%- endcase -%}
+          </div>
+        </div>
+      {%- else -%}
+        <p class="wt-hint" style="padding-top:1.6rem">{{ section.settings.no_filters_text }}</p>
+      {%- endfor -%}
+      <div class="wt-facets__apply"><button type="button" class="wt-btn wt-btn--block" data-wt-facets-close>{{ section.settings.apply_label }} ({{ collection.products_count }})</button></div>
+      <noscript><button class="wt-btn wt-btn--block" type="submit">{{ section.settings.apply_label }}</button></noscript>
+    </form>
+  </aside>
+
+  <div class="wt-results" data-wt-results>
+    {%- paginate collection.products by section.settings.per_page -%}
+      <div class="wt-toolbar">
+        <div class="wt-toolbar__row">
+          <h2 class="wt-h3 wt-toolbar__title">{{ collection.title }} <span class="wt-toolbar__count">({{ collection.products_count }})</span></h2>
+          <div class="wt-sort">
+            <button type="button" class="wt-btn wt-btn--outline wt-btn--sm wt-filter-open" aria-controls="WtFacets" aria-expanded="false" data-wt-facets-open>{% render 'wt-icon', icon: 'filter' %}{{ section.settings.filter_title }}{% if active_total > 0 %} ({{ active_total }}){% endif %}</button>
+            <label class="wt-visually-hidden" for="WtSort">{{ 'products.facets.sort_by_label' | t }}</label>
+            <select id="WtSort" class="wt-select" name="sort_by" form="WtFilterForm" data-wt-sort>
+              {%- for option in collection.sort_options -%}<option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort by: {{ option.name }}</option>{%- endfor -%}
+            </select>
+          </div>
+        </div>
+        <div class="wt-toolbar__row">
+          <div class="wt-pills">
+            {%- for f in collection.filters -%}
+              {%- if f.type == 'list' -%}
+                {%- assign key = f.param_name | handleize -%}
+                <details class="wt-pill">
+                  <summary>{{ f.label }}{% if f.active_values.size > 0 %} ({{ f.active_values.size }}){% endif %}{% render 'wt-icon', icon: 'chevron-down' %}</summary>
+                  <div class="wt-pill__panel">
+                    {%- for v in f.values -%}
+                      {%- unless v.count == 0 and v.active == false -%}
+                        <label for="Filter-{{ key }}-{{ forloop.index }}" class="{% if v.active %}is-active{% endif %}"><span>{{ v.label }}</span><span class="wt-check__count">{{ v.count }}</span></label>
+                      {%- endunless -%}
+                    {%- endfor -%}
+                  </div>
+                </details>
+              {%- endif -%}
+              {%- if forloop.index == 3 -%}{%- break -%}{%- endif -%}
+            {%- endfor -%}
+          </div>
+          <div class="wt-view" role="group" aria-label="Layout">
+            <span>View:</span>
+            <button type="button" aria-pressed="true" data-wt-view="grid">{% render 'wt-icon', icon: 'grid' %}<span class="wt-visually-hidden">Grid view</span></button>
+            <button type="button" aria-pressed="false" data-wt-view="list">{% render 'wt-icon', icon: 'list' %}<span class="wt-visually-hidden">List view</span></button>
+          </div>
+        </div>
+      </div>
+      <p class="wt-visually-hidden" role="status" data-wt-status>{{ collection.products_count }} products</p>
+      {%- if collection.products.size > 0 -%}
+        <ul class="wt-grid" style="--cols-d: {{ section.settings.columns }}" data-wt-grid>
+          {%- for product in collection.products -%}
+            <li>{%- if forloop.index <= 3 and paginate.current_page == 1 -%}{% render 'wt-product-card', product: product, eager: true %}{%- else -%}{% render 'wt-product-card', product: product %}{%- endif -%}</li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <div class="wt-empty"><p>{{ section.settings.empty_text }}</p><a class="wt-link" href="{{ collection.url }}" data-wt-ajax>{{ section.settings.clear_label }}{% render 'wt-icon', icon: 'arrow-right' %}</a></div>
+      {%- endif -%}
+      {%- if paginate.pages > 1 -%}
+        <nav aria-label="Pagination"><ul class="wt-pagination">
+          {%- if paginate.previous -%}<li><a class="wt-pg-arrow" href="{{ paginate.previous.url }}" data-wt-ajax aria-label="Previous page">{% render 'wt-icon', icon: 'chevron-left' %}</a></li>{%- endif -%}
+          {%- for part in paginate.parts -%}
+            <li>{%- if part.is_link -%}<a href="{{ part.url }}" data-wt-ajax aria-label="Page {{ part.title }}">{{ part.title }}</a>{%- elsif part.title == paginate.current_page -%}<span aria-current="page">{{ part.title }}</span>{%- else -%}<span>{{ part.title }}</span>{%- endif -%}</li>
+          {%- endfor -%}
+          {%- if paginate.next -%}<li><a class="wt-pg-arrow" href="{{ paginate.next.url }}" data-wt-ajax aria-label="Next page">{% render 'wt-icon', icon: 'chevron-right' %}</a></li>{%- endif -%}
+        </ul></nav>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "WT Collection grid",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Products per page", "min": 6, "max": 48, "step": 3, "default": 12 },
+    { "type": "range", "id": "columns", "label": "Desktop columns", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "text", "id": "filter_title", "label": "Filter heading", "default": "Filter & Refine" },
+    { "type": "text", "id": "clear_label", "label": "Clear label", "default": "Clear all" },
+    { "type": "text", "id": "active_label", "label": "Active filters label", "default": "Active filters" },
+    { "type": "text", "id": "apply_label", "label": "Mobile apply label", "default": "Show results" },
+    { "type": "text", "id": "price_label", "label": "Price filter label", "default": "Price (per m²)" },
+    { "type": "number", "id": "price_multiplier", "label": "Price filter display multiplier", "default": 100, "info": "Made-to-measure variants are priced per 0.01 m². 100 shows the price filter per m². Use 1 for normal collections." },
+    { "type": "text", "id": "empty_text", "label": "No results text", "default": "No products match these filters." },
+    { "type": "text", "id": "no_filters_text", "label": "No filters configured text", "default": "Add filters in Search & Discovery to enable filtering." }
+  ]
+}
+{% endschema %}

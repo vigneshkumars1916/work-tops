@@ -1,0 +1,38 @@
+{{ 'wt-collection.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign img = collection.metafields.custom.hero_image.value | default: section.settings.image | default: collection.image
+  assign feats = collection.metafields.custom.hero_features.value
+-%}
+<section class="wt-chero" style="--h: {{ section.settings.height }}px">
+  <div class="wt-chero__media">
+    {%- if img != blank -%}{% render 'wt-image', image: img, sizes: '(min-width: 900px) 52vw, 100vw', eager: true, alt: '' %}{%- else -%}{{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}
+  </div>
+  <div class="wt-container wt-chero__inner">
+    {% render 'wt-breadcrumbs', parent: section.settings.parent %}
+    <div class="wt-chero__content">
+      <h1 class="wt-h1">{{ collection.title }}</h1>
+      {%- if collection.description != blank -%}<div class="wt-lead wt-chero__desc wt-rte">{{ collection.description }}</div>{%- endif -%}
+      {%- if feats != blank -%}
+        <ul class="wt-chero__feats">
+          {%- for f in feats -%}<li>{% render 'wt-icon', icon: f.icon.value %}<span>{{ f.title.value | replace: ' & ', ' &amp;<br>' }}</span></li>{%- endfor -%}
+        </ul>
+      {%- elsif section.settings.features.count > 0 -%}
+        <ul class="wt-chero__feats">
+          {%- for f in section.settings.features -%}<li>{% render 'wt-icon', icon: f.icon.value %}<span>{{ f.title.value }}</span></li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "WT Collection hero",
+  "settings": [
+    { "type": "paragraph", "content": "Per-collection image and features come from collection metafields (Hero image, Hero features). These settings are the fallback." },
+    { "type": "image_picker", "id": "image", "label": "Fallback image" },
+    { "type": "metaobject_list", "id": "features", "label": "Fallback features", "metaobject_type": "feature", "limit": 4 },
+    { "type": "collection", "id": "parent", "label": "Breadcrumb parent collection" },
+    { "type": "range", "id": "height", "label": "Desktop height", "min": 280, "max": 600, "step": 10, "unit": "px", "default": 380 }
+  ]
+}
+{% endschema %}

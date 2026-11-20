@@ -1,0 +1,55 @@
+{%- doc -%}
+  Breadcrumb trail + BreadcrumbList JSON-LD.
+  On product pages the trail is Home > parent collection (current collection, else first non-"all" collection, else Worktops setting) > product.
+  @param {collection} [parent] - optional parent collection (e.g. "Worktops" for material collections)
+{%- enddoc -%}
+{%- liquid
+  assign home_url = shop.url | append: routes.root_url
+  assign trail_parent = parent
+  if request.page_type == 'product'
+    assign trail_col = collection
+    if trail_col == blank
+      for c in product.collections
+        if c.handle contains '-worktops' or c.handle == 'accessories' or c.handle == 'sinks'
+          assign trail_col = c
+          break
+        endif
+      endfor
+    endif
+  endif
+-%}
+<nav class="wt-breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="{{ routes.root_url }}">Home</a></li>
+    {%- if trail_parent != blank and trail_parent.handle != collection.handle -%}<li><a href="{{ trail_parent.url }}">{{ trail_parent.title }}</a></li>{%- endif -%}
+    {%- if request.page_type == 'collection' -%}
+      <li><span aria-current="page">{{ collection.title }}</span></li>
+    {%- elsif request.page_type == 'product' -%}
+      {%- if trail_col -%}<li><a href="{{ trail_col.url }}">{{ trail_col.title }}</a></li>{%- endif -%}
+      <li><span aria-current="page">{{ product.title }}</span></li>
+    {%- else -%}
+      <li><span aria-current="page">{{ page_title }}</span></li>
+    {%- endif -%}
+  </ol>
+</nav>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": {{ home_url | json }} }
+    {%- assign n = 1 -%}
+    {%- if trail_parent != blank and trail_parent.handle != collection.handle -%}{%- assign n = n | plus: 1 -%},
+    { "@type": "ListItem", "position": {{ n }}, "name": {{ trail_parent.title | json }}, "item": {{ shop.url | append: trail_parent.url | json }} }
+    {%- endif -%}
+    {%- if request.page_type == 'collection' -%}{%- assign n = n | plus: 1 -%},
+    { "@type": "ListItem", "position": {{ n }}, "name": {{ collection.title | json }}, "item": {{ shop.url | append: collection.url | json }} }
+    {%- elsif request.page_type == 'product' -%}
+      {%- if trail_col -%}{%- assign n = n | plus: 1 -%},
+    { "@type": "ListItem", "position": {{ n }}, "name": {{ trail_col.title | json }}, "item": {{ shop.url | append: trail_col.url | json }} }
+      {%- endif -%}{%- assign n = n | plus: 1 -%},
+    { "@type": "ListItem", "position": {{ n }}, "name": {{ product.title | json }}, "item": {{ shop.url | append: product.url | json }} }
+    {%- endif %}
+  ]
+}
+</script>

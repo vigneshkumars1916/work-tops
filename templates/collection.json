@@ -1,36 +1,59 @@
 {
   "sections": {
-    "banner": {
-      "type": "main-collection-banner",
+    "hero": {
+      "type": "wt-collection-hero",
       "settings": {
-        "show_collection_description": true,
-        "show_collection_image": false,
-        "color_scheme": "scheme-1"
+        "parent": "worktops",
+        "height": 380,
+        "features": [
+          "non-porous",
+          "highly-durable",
+          "low-maintenance"
+        ],
+        "image": "shopify://shop_images/photo-1772567732923-5ba1956dcd07.jpg"
       }
     },
-    "product-grid": {
-      "type": "main-collection-product-grid",
+    "main": {
+      "type": "wt-main-collection",
       "settings": {
-        "products_per_page": 16,
-        "columns_desktop": 4,
-        "color_scheme": "scheme-1",
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": false,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "enable_filtering": true,
-        "filter_type": "horizontal",
-        "enable_sorting": true,
-        "columns_mobile": "2",
-        "padding_top": 36,
-        "padding_bottom": 36
+        "per_page": 12,
+        "columns": 3,
+        "price_multiplier": 100
+      }
+    },
+    "usps": {
+      "type": "wt-usp-bar",
+      "settings": {
+        "features": [
+          "premium-quality",
+          "custom-sizes",
+          "uk-wide-delivery",
+          "10-year-warranty"
+        ],
+        "boxed": true,
+        "pt": 0,
+        "pb": 25
+      }
+    },
+    "cta": {
+      "type": "wt-cta-split",
+      "settings": {
+        "eyebrow": "Made to measure",
+        "heading": "Need a Custom Quartz Worktop?",
+        "btn1_label": "Create a Custom Worktop",
+        "btn1_link": "shopify://products/calacatta-white-quartz",
+        "btn2_label": "Request a Free Quote",
+        "btn2_link": "shopify://pages/request-a-quote",
+        "pt": 25,
+        "pb": 100,
+        "image": "shopify://shop_images/photo-1758448755927-e5c5ae14790c.jpg"
       }
     }
   },
   "order": [
-    "banner",
-    "product-grid"
+    "hero",
+    "main",
+    "usps",
+    "cta"
   ]
 }
