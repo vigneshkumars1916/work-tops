@@ -1,0 +1,55 @@
+{{ 'wt-home.css' | asset_url | stylesheet_tag }}
+<section class="wt-section" style="--wt-pt: {{ section.settings.pt | divided_by: 100.0 }}; --wt-pb: {{ section.settings.pb | divided_by: 100.0 }};">
+  <div class="wt-container">
+    <div class="wt-cs">
+      <div class="wt-cs__img">
+        {%- if section.settings.image != blank -%}{% render 'wt-image', image: section.settings.image, sizes: '(min-width: 1100px) 30vw, (min-width: 700px) 46vw, 92vw', widths: '400, 600, 800, 1000' %}{%- else -%}{{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}
+      </div>
+      <div class="wt-cs__text">
+        {%- if section.settings.eyebrow != blank -%}<p class="wt-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+        <h2 class="wt-h2">{{ section.settings.heading }}</h2>
+        <div class="wt-lead wt-rte">{{ section.settings.text }}</div>
+        {%- if section.settings.btn_label != blank -%}<a class="wt-btn" href="{{ section.settings.btn_link | default: '#' }}">{{ section.settings.btn_label }}{% render 'wt-icon', icon: 'arrow-right' %}</a>{%- endif -%}
+      </div>
+      {%- if section.settings.show_diagram -%}
+        <div class="wt-cs__diagram" aria-hidden="true">
+          <div class="wt-dim">
+            <div class="wt-dim__w"><span class="wt-dim__pill">{{ section.settings.width_label }}</span><span class="wt-dim__line"></span></div>
+            <div class="wt-dim__l"><span>{{ section.settings.length_label | newline_to_br }}</span><span class="wt-dim__vline"></span></div>
+            <div class="wt-dim__slab">{%- if section.settings.slab_image != blank -%}{{ section.settings.slab_image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 600', sizes: '300px', alt: '' }}{%- endif -%}</div>
+          </div>
+          <div class="wt-cs__feats">
+            {%- for block in section.blocks -%}<div class="wt-cs__feat" {{ block.shopify_attributes }}>{% render 'wt-icon', icon: block.settings.icon %}<span>{{ block.settings.text | newline_to_br }}</span></div>{%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "WT Custom size promo",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Made to measure" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Custom-Size Worktops" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Enter your exact dimensions, choose your thickness and edge profile, and get an instant price online.</p>" },
+    { "type": "text", "id": "btn_label", "label": "Button label", "default": "Create Your Worktop" },
+    { "type": "url", "id": "btn_link", "label": "Button link" },
+    { "type": "checkbox", "id": "show_diagram", "label": "Show dimension diagram", "default": true },
+    { "type": "image_picker", "id": "slab_image", "label": "Diagram slab texture" },
+    { "type": "text", "id": "width_label", "label": "Width label", "default": "Width (mm)" },
+    { "type": "textarea", "id": "length_label", "label": "Length label", "default": "Length\n(mm)" },
+    { "type": "range", "id": "pt", "label": "Top spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 25 },
+    { "type": "range", "id": "pb", "label": "Bottom spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 25 }
+  ],
+  "blocks": [
+    { "type": "feature", "name": "Diagram feature", "settings": [
+      { "type": "select", "id": "icon", "label": "Icon", "default": "layers", "options": [{ "value": "layers", "label": "Layers" }, { "value": "edge-bullnose", "label": "Edge" }, { "value": "ruler", "label": "Ruler" }, { "value": "diamond", "label": "Diamond" }] },
+      { "type": "textarea", "id": "text", "label": "Text", "default": "20mm / 30mm\nThickness" }
+    ] }
+  ],
+  "max_blocks": 3,
+  "presets": [{ "name": "WT Custom size promo", "blocks": [{ "type": "feature" }] }]
+}
+{% endschema %}

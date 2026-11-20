@@ -1,0 +1,42 @@
+{%- doc -%}
+  Product card used on collection grids and carousels.
+  @param {product} product
+  @param {boolean} [eager] - load image eagerly (first row)
+  @param {string} [sizes]
+{%- enddoc -%}
+{%- liquid
+  assign badge = product.metafields.custom.badge.value
+  assign tagline = product.metafields.custom.tagline.value
+  assign family = product.metafields.custom.colour_family.value
+  assign card_sizes = sizes | default: '(min-width: 1200px) 340px, (min-width: 750px) 45vw, 92vw'
+-%}
+<article class="wt-card">
+  <div class="wt-card__media">
+    {%- if badge != blank -%}<span class="wt-badge wt-card__badge">{{ badge }}</span>{%- endif -%}
+    {%- if product.featured_image -%}
+      {%- if eager -%}
+        {% render 'wt-image', image: product.featured_image, sizes: card_sizes, widths: '320, 480, 640, 800', eager: true, alt: product.title %}
+      {%- else -%}
+        {% render 'wt-image', image: product.featured_image, sizes: card_sizes, widths: '320, 480, 640, 800', alt: product.title %}
+      {%- endif -%}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+  <button type="button" class="wt-iconbtn wt-card__wish" aria-pressed="false" data-wt-wish="{{ product.handle }}">
+    {%- render 'wt-icon', icon: 'heart', size: 18 -%}<span class="wt-visually-hidden">Save {{ product.title | escape }}</span>
+  </button>
+  <div class="wt-card__body">
+    <h3 class="wt-card__title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+    {%- if tagline != blank -%}<p class="wt-card__tagline">{{ tagline }}</p>{%- endif -%}
+    <p class="wt-card__price">{% render 'wt-price', product: product, prefix: true %}</p>
+    <div class="wt-card__foot">
+      {%- if family != blank -%}
+        <ul class="wt-dots" aria-label="Available colours">
+          {%- for c in family limit: 4 -%}<li class="wt-dot" style="--c: {{ c.hex.value | default: '#ddd' }}" title="{{ c.name.value | escape }}"><span class="wt-visually-hidden">{{ c.name.value }}</span></li>{%- endfor -%}
+        </ul>
+      {%- else -%}<span></span>{%- endif -%}
+      <span class="wt-card__go" aria-hidden="true">{% render 'wt-icon', icon: 'arrow-right' %}</span>
+    </div>
+  </div>
+</article>

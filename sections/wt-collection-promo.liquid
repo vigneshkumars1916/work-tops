@@ -1,0 +1,49 @@
+{{ 'wt-home.css' | asset_url | stylesheet_tag }}
+{%- assign c = section.settings.collection -%}
+<section class="wt-section" style="--wt-pt: {{ section.settings.pt | divided_by: 100.0 }}; --wt-pb: {{ section.settings.pb | divided_by: 100.0 }};">
+  <div class="wt-container wt-promo">
+    <div class="wt-promo__img">
+      {%- if section.settings.image != blank -%}{% render 'wt-image', image: section.settings.image, sizes: '(min-width: 990px) 45vw, 92vw', widths: '480, 720, 960, 1200' %}{%- elsif c.image -%}{% render 'wt-image', image: c.image, sizes: '(min-width: 990px) 45vw, 92vw' %}{%- else -%}{{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}
+    </div>
+    <div class="wt-promo__text">
+      {%- if section.settings.eyebrow != blank -%}<p class="wt-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2 class="wt-h2">{{ section.settings.heading | default: c.title }}</h2>
+      <div class="wt-lead wt-rte">{{ section.settings.text | default: c.description }}</div>
+      {%- if section.settings.btn_label != blank -%}<a class="wt-btn" href="{{ c.url | default: '#' }}">{{ section.settings.btn_label }}{% render 'wt-icon', icon: 'arrow-right' %}</a>{%- endif -%}
+    </div>
+    {%- if section.blocks.size > 0 -%}
+      <div class="wt-promo__sw">
+        {%- for block in section.blocks -%}
+          {%- assign bp = block.settings.product -%}
+          {%- assign bimg = block.settings.image | default: bp.featured_image -%}
+          <a href="{{ bp.url | default: c.url | default: '#' }}" {{ block.shopify_attributes }} aria-label="{{ bp.title | default: 'View swatch' | escape }}">
+            {%- if bimg != blank -%}{{ bimg | image_url: width: 400 | image_tag: loading: 'lazy', widths: '200, 400', sizes: '160px', alt: '' }}{%- else -%}{{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "WT Collection promo",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Popular collection" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Quartz Worktops" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Durable, non-porous and beautifully versatile. A perfect balance of style and performance.</p>" },
+    { "type": "text", "id": "btn_label", "label": "Button label", "default": "Explore Collection" },
+    { "type": "range", "id": "pt", "label": "Top spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 25 },
+    { "type": "range", "id": "pb", "label": "Bottom spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 25 }
+  ],
+  "blocks": [
+    { "type": "swatch", "name": "Swatch", "settings": [
+      { "type": "product", "id": "product", "label": "Product" },
+      { "type": "image_picker", "id": "image", "label": "Swatch image override" }
+    ] }
+  ],
+  "max_blocks": 3,
+  "presets": [{ "name": "WT Collection promo" }]
+}
+{% endschema %}

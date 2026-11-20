@@ -1,75 +1,274 @@
 {
   "sections": {
-    "image_banner": {
-      "type": "image-banner",
+    "hero": {
+      "type": "wt-hero",
       "blocks": {
-        "heading": {
-          "type": "heading",
+        "s1": {
+          "type": "slide",
           "settings": {
-            "heading": "Browse our latest products",
-            "heading_size": "h0"
+            "image": "shopify://shop_images/photo-1776395159816-ef1cc372552b.jpg"
           }
         },
-        "button": {
-          "type": "buttons",
+        "s2": {
+          "type": "slide",
           "settings": {
-            "button_label_1": "Shop all",
-            "button_link_1": "shopify://collections/all",
-            "button_style_secondary_1": true,
-            "button_label_2": "",
-            "button_link_2": "",
-            "button_style_secondary_2": false
+            "image": "shopify://shop_images/photo-1682888813913-e13f18692019.jpg"
+          }
+        },
+        "s3": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/photo-1785535573676-5dafa00b3c8b.jpg"
+          }
+        },
+        "f1": {
+          "type": "feature",
+          "settings": {
+            "icon": "ruler",
+            "text": "Made to Measure"
+          }
+        },
+        "f2": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "text": "UK Wide Delivery"
+          }
+        },
+        "f3": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "text": "Quality Guaranteed"
           }
         }
       },
       "block_order": [
-        "heading",
-        "button"
+        "s1",
+        "s2",
+        "s3",
+        "f1",
+        "f2",
+        "f3"
       ],
       "settings": {
-        "image_overlay_opacity": 40,
-        "image_height": "large",
-        "desktop_content_position": "bottom-center",
-        "show_text_box": false,
-        "image_behavior": "none",
-        "desktop_content_alignment": "center",
-        "color_scheme": "scheme-3",
-        "mobile_content_alignment": "center",
-        "stack_images_on_mobile": false,
-        "show_text_below": false
+        "eyebrow": "Premium Stone Worktops",
+        "heading": "Bespoke Worktops Made for Your Space",
+        "heading_tag": "h1",
+        "text": "<p>Precision-cut granite, quartz, marble and more.<br>Custom sizes, expert finish and UK-wide delivery.</p>",
+        "btn1_label": "Shop Worktops",
+        "btn1_link": "shopify://collections/worktops",
+        "btn2_label": "Request a Free Quote",
+        "btn2_link": "shopify://pages/request-a-quote",
+        "product": "calacatta-white-quartz",
+        "product_label": "Calacatta Quartz",
+        "height": 560,
+        "image_width": 61,
+        "autoplay": false
       }
     },
-    "featured_collection": {
-      "type": "featured-collection",
+    "materials": {
+      "type": "wt-materials",
+      "blocks": {
+        "m1": {
+          "type": "material",
+          "settings": {
+            "collection": "quartz-worktops",
+            "label": "Quartz"
+          }
+        },
+        "m2": {
+          "type": "material",
+          "settings": {
+            "collection": "granite-worktops",
+            "label": "Granite"
+          }
+        },
+        "m3": {
+          "type": "material",
+          "settings": {
+            "collection": "marble-worktops",
+            "label": "Marble"
+          }
+        },
+        "m4": {
+          "type": "material",
+          "settings": {
+            "collection": "limestone-worktops",
+            "label": "Limestone"
+          }
+        },
+        "m5": {
+          "type": "material",
+          "settings": {
+            "collection": "porcelain-worktops",
+            "label": "Porcelain"
+          }
+        },
+        "m6": {
+          "type": "material",
+          "settings": {
+            "collection": "onyx-worktops",
+            "label": "Onyx"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "m3",
+        "m4",
+        "m5",
+        "m6"
+      ],
       "settings": {
-        "title": "Featured products",
-        "heading_size": "h2",
-        "description": "",
-        "show_description": false,
-        "description_style": "body",
-        "collection": "all",
-        "products_to_show": 8,
-        "columns_desktop": 4,
-        "color_scheme": "scheme-1",
-        "full_width": false,
-        "show_view_all": true,
-        "view_all_style": "solid",
-        "enable_desktop_slider": false,
-        "swipe_on_mobile": false,
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "columns_mobile": "2",
-        "padding_top": 44,
-        "padding_bottom": 36
+        "eyebrow": "Explore our range",
+        "heading": "Shop by Material",
+        "link_label": "View All Materials",
+        "link_url": "shopify://collections/worktops",
+        "pt": 75,
+        "pb": 50
+      }
+    },
+    "custom": {
+      "type": "wt-custom-size",
+      "blocks": {
+        "d1": {
+          "type": "feature",
+          "settings": {
+            "icon": "layers",
+            "text": "20mm / 30mm\nThickness"
+          }
+        },
+        "d2": {
+          "type": "feature",
+          "settings": {
+            "icon": "edge-bullnose",
+            "text": "Straight /\nBullnose / Bevelled"
+          }
+        }
+      },
+      "block_order": [
+        "d1",
+        "d2"
+      ],
+      "settings": {
+        "eyebrow": "Made to measure",
+        "heading": "Custom-Size Worktops",
+        "btn_label": "Create Your Worktop",
+        "btn_link": "shopify://products/calacatta-white-quartz",
+        "pt": 25,
+        "pb": 25,
+        "image": "shopify://shop_images/photo-1694376329556-cf1ba3610960.jpg",
+        "slab_image": "shopify://shop_images/photo-1551554781-c46200ea959d.jpg"
+      }
+    },
+    "promo": {
+      "type": "wt-collection-promo",
+      "blocks": {
+        "w1": {
+          "type": "swatch",
+          "settings": {
+            "product": "calacatta-white-quartz"
+          }
+        },
+        "w2": {
+          "type": "swatch",
+          "settings": {
+            "product": "nero-gold-quartz"
+          }
+        },
+        "w3": {
+          "type": "swatch",
+          "settings": {
+            "product": "terrazzo-grey-quartz"
+          }
+        }
+      },
+      "block_order": [
+        "w1",
+        "w2",
+        "w3"
+      ],
+      "settings": {
+        "collection": "quartz-worktops",
+        "eyebrow": "Popular collection",
+        "heading": "Quartz Worktops",
+        "btn_label": "Explore Collection",
+        "pt": 25,
+        "pb": 25,
+        "image": "shopify://shop_images/photo-1772567732996-bc693c4a016c.jpg"
+      }
+    },
+    "usps": {
+      "type": "wt-usp-bar",
+      "settings": {
+        "features": [
+          "premium-materials",
+          "uk-wide-delivery",
+          "10-year-warranty",
+          "expert-support"
+        ],
+        "boxed": false,
+        "pt": 25,
+        "pb": 25
+      }
+    },
+    "testimonial": {
+      "type": "wt-testimonial-stats",
+      "blocks": {
+        "st1": {
+          "type": "stat",
+          "settings": {
+            "number": "1,200+",
+            "label": "Happy Customers"
+          }
+        },
+        "st2": {
+          "type": "stat",
+          "settings": {
+            "number": "15+",
+            "label": "Stone Materials"
+          }
+        },
+        "st3": {
+          "type": "stat",
+          "settings": {
+            "number": "10+",
+            "label": "Years of Experience"
+          }
+        }
+      },
+      "block_order": [
+        "st1",
+        "st2",
+        "st3"
+      ],
+      "settings": {
+        "testimonial": "sarah-m",
+        "bg": "shopify://shop_images/photo-1786673211400-90f79d15b1ff.jpg"
+      }
+    },
+    "blog": {
+      "type": "wt-blog-grid",
+      "settings": {
+        "blog": "blog",
+        "count": 4,
+        "eyebrow": "Inspiration & guides",
+        "heading": "Ideas for Your Next Project",
+        "link_label": "View All Articles",
+        "pt": 75,
+        "pb": 100
       }
     }
   },
   "order": [
-    "image_banner",
-    "featured_collection"
+    "hero",
+    "materials",
+    "custom",
+    "promo",
+    "usps",
+    "testimonial",
+    "blog"
   ]
 }

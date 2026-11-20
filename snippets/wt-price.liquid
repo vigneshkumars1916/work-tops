@@ -1,0 +1,21 @@
+{%- doc -%}
+  Price display aware of made-to-measure pricing (variant price is per 0.01 m2, displayed per m2).
+  @param {product} product
+  @param {variant} [variant] - specific variant (defaults to cheapest)
+  @param {boolean} [prefix] - prepend "From"
+{%- enddoc -%}
+{%- liquid
+  assign mtm = product.metafields.custom.made_to_measure.value
+  if variant
+    assign amount = variant.price
+  else
+    assign amount = product.price_min
+  endif
+  if mtm
+    assign amount = amount | times: 100
+    assign suffix = product.metafields.custom.price_suffix.value | default: '/ m²'
+  else
+    assign suffix = product.metafields.custom.price_suffix.value
+  endif
+-%}
+{%- if prefix and product.price_varies or prefix and mtm -%}<span class="wt-price__from">From </span>{%- endif -%}<span class="wt-price__amount">{{ amount | money_without_trailing_zeros }}</span>{%- if suffix != blank %} <span class="wt-price__unit">{{ suffix }}</span>{%- endif -%}

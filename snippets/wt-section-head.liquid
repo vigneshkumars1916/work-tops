@@ -1,0 +1,14 @@
+{%- doc -%}
+  @param {string} [eyebrow]
+  @param {string} heading
+  @param {string} [link_label]
+  @param {string} [link_url]
+  @param {string} [tag] - h2 default
+{%- enddoc -%}
+<div class="wt-section-head">
+  <div>
+    {%- if eyebrow != blank -%}<p class="wt-eyebrow">{{ eyebrow }}</p>{%- endif -%}
+    {%- if heading != blank -%}<h2 class="wt-h2">{{ heading }}</h2>{%- endif -%}
+  </div>
+  {%- if link_label != blank -%}<a class="wt-link" href="{{ link_url | default: '#' }}">{{ link_label }}{% render 'wt-icon', icon: 'arrow-right' %}</a>{%- endif -%}
+</div>

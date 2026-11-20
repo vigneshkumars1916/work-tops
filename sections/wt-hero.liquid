@@ -1,0 +1,113 @@
+{{ 'wt-hero.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign slides = section.blocks | where: 'type', 'slide'
+  assign features = section.blocks | where: 'type', 'feature'
+  assign p = section.settings.product
+-%}
+<section class="wt-hero" style="--h: {{ section.settings.height }}px; --img-w: {{ section.settings.image_width }}%;" aria-roledescription="carousel" aria-label="{{ section.settings.heading | strip_html | escape }}">
+  <div class="wt-hero__media">
+    {%- for block in slides -%}
+      <div class="wt-hero__slide{% if forloop.first %} is-active{% endif %}" {{ block.shopify_attributes }} role="group" aria-roledescription="slide" aria-label="{{ forloop.index }} / {{ slides.size }}"{% unless forloop.first %} aria-hidden="true"{% endunless %}>
+        {%- if block.settings.image != blank -%}
+          {%- if forloop.first -%}
+            {% render 'wt-image', image: block.settings.image, sizes: '(min-width: 900px) 62vw, 100vw', eager: true %}
+          {%- else -%}
+            {% render 'wt-image', image: block.settings.image, sizes: '(min-width: 900px) 62vw, 100vw' %}
+          {%- endif -%}
+        {%- else -%}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+  {%- if slides.size > 1 -%}
+    <div class="wt-hero__dots-wrap" data-wt-hero-dots>
+      {%- for block in slides -%}
+        <button type="button" class="wt-hero__dot" aria-label="Show slide {{ forloop.index }}"{% if forloop.first %} aria-current="true"{% endif %} data-index="{{ forloop.index0 }}"></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+  <div class="wt-container wt-hero__inner">
+    <div class="wt-hero__content">
+      {%- if section.settings.eyebrow != blank -%}<p class="wt-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      {%- if section.settings.heading_tag == 'h1' -%}
+        <h1 class="wt-h1">{{ section.settings.heading }}</h1>
+      {%- else -%}
+        <h2 class="wt-h1">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}<div class="wt-lead wt-hero__text wt-rte">{{ section.settings.text }}</div>{%- endif -%}
+      <div class="wt-hero__ctas">
+        {%- if section.settings.btn1_label != blank -%}<a class="wt-btn" href="{{ section.settings.btn1_link | default: '#' }}">{{ section.settings.btn1_label }}{% render 'wt-icon', icon: 'arrow-right' %}</a>{%- endif -%}
+        {%- if section.settings.btn2_label != blank -%}<a class="wt-btn wt-btn--outline" href="{{ section.settings.btn2_link | default: '#' }}">{{ section.settings.btn2_label }}</a>{%- endif -%}
+      </div>
+      {%- if features.size > 0 -%}
+        <ul class="wt-hero__features">
+          {%- for block in features -%}<li {{ block.shopify_attributes }}>{% render 'wt-icon', icon: block.settings.icon %}<span>{{ block.settings.text }}</span></li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+  {%- if p != blank -%}
+    <a class="wt-hero__chip" href="{{ p.url }}">
+      <span class="wt-hero__chip-img">{%- if p.featured_image -%}{{ p.featured_image | image_url: width: 160 | image_tag: width: 64, height: 44, alt: '', loading: 'lazy' }}{%- endif -%}</span>
+      <span>
+        <p class="wt-hero__chip-title">{{ section.settings.product_label | default: p.title }}</p>
+        <p class="wt-hero__chip-price">{% render 'wt-price', product: p, prefix: true %}</p>
+      </span>
+      <span class="wt-card__go" aria-hidden="true">{% render 'wt-icon', icon: 'arrow-right' %}</span>
+    </a>
+  {%- endif -%}
+</section>
+{%- if slides.size > 1 -%}
+<script>
+  (() => {
+    const s = document.currentScript.previousElementSibling;
+    const slides = [...s.querySelectorAll('.wt-hero__slide')];
+    const dots = [...s.querySelectorAll('.wt-hero__dot')];
+    let i = 0, t;
+    const go = (n) => {
+      slides[i].classList.remove('is-active'); slides[i].setAttribute('aria-hidden', 'true'); dots[i].removeAttribute('aria-current');
+      i = (n + slides.length) % slides.length;
+      slides[i].classList.add('is-active'); slides[i].removeAttribute('aria-hidden'); dots[i].setAttribute('aria-current', 'true');
+    };
+    dots.forEach((d) => d.addEventListener('click', () => { clearInterval(t); go(+d.dataset.index); }));
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    {%- if section.settings.autoplay -%}
+    if (!reduce) { t = setInterval(() => go(i + 1), {{ section.settings.speed | times: 1000 }}); s.addEventListener('focusin', () => clearInterval(t)); s.addEventListener('mouseenter', () => clearInterval(t)); }
+    {%- endif -%}
+  })();
+</script>
+{%- endif -%}
+{% schema %}
+{
+  "name": "WT Hero",
+  "class": "wt-hero-section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Premium Stone Worktops" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Bespoke Worktops Made for Your Space" },
+    { "type": "select", "id": "heading_tag", "label": "Heading tag", "options": [{ "value": "h1", "label": "H1 (page title)" }, { "value": "h2", "label": "H2" }], "default": "h1", "info": "Use H1 only once per page" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Precision-cut granite, quartz, marble and more. Custom sizes, expert finish and UK-wide delivery.</p>" },
+    { "type": "text", "id": "btn1_label", "label": "Primary button label", "default": "Shop Worktops" },
+    { "type": "url", "id": "btn1_link", "label": "Primary button link" },
+    { "type": "text", "id": "btn2_label", "label": "Secondary button label", "default": "Request a Free Quote" },
+    { "type": "url", "id": "btn2_link", "label": "Secondary button link" },
+    { "type": "header", "content": "Featured product chip" },
+    { "type": "product", "id": "product", "label": "Product" },
+    { "type": "text", "id": "product_label", "label": "Label override", "default": "Calacatta Quartz" },
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "height", "label": "Desktop height", "min": 420, "max": 760, "step": 10, "unit": "px", "default": 560 },
+    { "type": "range", "id": "image_width", "label": "Image width", "min": 40, "max": 75, "step": 1, "unit": "%", "default": 61 },
+    { "type": "checkbox", "id": "autoplay", "label": "Auto-rotate slides", "default": false },
+    { "type": "range", "id": "speed", "label": "Seconds per slide", "min": 3, "max": 10, "step": 1, "default": 6 }
+  ],
+  "blocks": [
+    { "type": "slide", "name": "Image slide", "settings": [ { "type": "image_picker", "id": "image", "label": "Image" } ] },
+    { "type": "feature", "name": "Feature", "settings": [
+      { "type": "select", "id": "icon", "label": "Icon", "default": "ruler", "options": [{ "value": "ruler", "label": "Ruler" }, { "value": "truck", "label": "Truck" }, { "value": "shield", "label": "Shield" }, { "value": "diamond", "label": "Diamond" }, { "value": "headset", "label": "Headset" }, { "value": "tools", "label": "Tools" }, { "value": "leaf", "label": "Leaf" }] },
+      { "type": "text", "id": "text", "label": "Text", "default": "Made to Measure" }
+    ] }
+  ],
+  "max_blocks": 8,
+  "presets": [{ "name": "WT Hero", "blocks": [{ "type": "slide" }, { "type": "feature" }] }]
+}
+{% endschema %}

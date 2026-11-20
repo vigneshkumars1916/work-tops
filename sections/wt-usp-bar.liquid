@@ -1,0 +1,39 @@
+<section class="{% if section.settings.boxed %}wt-section{% endif %}" style="--wt-pt: {{ section.settings.pt | divided_by: 100.0 }}; --wt-pb: {{ section.settings.pb | divided_by: 100.0 }};">
+  <div class="wt-container">
+    <div class="{% if section.settings.boxed %}wt-uspbox{% else %}wt-uspbar{% endif %}">
+      <ul class="wt-features" style="--cols: {{ section.settings.features.count | default: 4 | at_least: 1 }}" role="list">
+        {%- for f in section.settings.features -%}
+          <li class="wt-feature">
+            {% render 'wt-icon', icon: f.icon.value %}
+            <div>
+              <p class="wt-feature__title">{{ f.title.value }}</p>
+              {%- if f.text.value != blank -%}<p class="wt-feature__text">{{ f.text.value }}</p>{%- endif -%}
+            </div>
+          </li>
+        {%- else -%}
+          <li class="wt-feature"><p class="wt-feature__text">Pick features (metaobject entries) in the theme editor.</p></li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+</section>
+<style>
+  .wt-uspbar{border-block:1px solid var(--wt-line);padding-block:2.4rem}
+  .wt-uspbox{background:var(--wt-surface);border-radius:var(--wt-radius);padding:3.2rem 1.6rem}
+  .wt-uspbox .wt-feature{flex-direction:column;text-align:center;gap:1.2rem}
+  .wt-uspbox .wt-feature__title{font-size:1.7rem}
+  .wt-uspbox .wt-feature .wt-icon{width:3.6rem;height:3.6rem}
+  ul.wt-features{list-style:none;margin:0;padding:0}
+</style>
+{% schema %}
+{
+  "name": "WT Feature bar",
+  "settings": [
+    { "type": "metaobject_list", "id": "features", "label": "Features", "metaobject_type": "feature", "limit": 6, "info": "Manage entries in Content > Metaobjects > Feature / USP" },
+    { "type": "checkbox", "id": "boxed", "label": "Boxed card style (centered)", "default": false },
+    { "type": "range", "id": "pt", "label": "Top spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 50 },
+    { "type": "range", "id": "pb", "label": "Bottom spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 50 }
+  ],
+  "presets": [{ "name": "WT Feature bar" }]
+}
+{% endschema %}
