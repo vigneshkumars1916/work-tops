@@ -1,0 +1,53 @@
+<div class="wt-topbar" role="region" aria-label="{{ section.settings.aria_label | escape }}">
+  <div class="wt-container wt-topbar__inner">
+    <ul class="wt-topbar__usps">
+      {%- for block in section.blocks -%}
+        <li {{ block.shopify_attributes }}>
+          {%- render 'wt-icon', icon: block.settings.icon -%}
+          {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{{ block.settings.text }}</a>{%- else -%}<span>{{ block.settings.text }}</span>{%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+    {%- if section.settings.show_trust -%}
+      <a class="wt-trust" href="{{ section.settings.trust_link | default: '#' }}"{% if section.settings.trust_link != blank %} target="_blank" rel="noopener"{% endif %}>
+        {%- if section.settings.trust_label != blank -%}<span class="wt-trust__label">{{ section.settings.trust_label }}</span>{%- endif -%}
+        {%- if section.settings.trust_style == 'stars' -%}
+          <span class="wt-trust__stars" aria-hidden="true">{% for i in (1..5) %}<span>{% render 'wt-icon', icon: 'star' %}</span>{% endfor %}</span>
+        {%- else -%}
+          <span class="wt-trust__logo">{% render 'wt-icon', icon: 'star' %}{{ section.settings.trust_brand }}</span>
+        {%- endif -%}
+        <span>{{ section.settings.trust_text }}</span>
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "WT Announcement bar",
+  "class": "wt-announcement-section",
+  "settings": [
+    { "type": "text", "id": "aria_label", "label": "Accessible label", "default": "Store benefits" },
+    { "type": "checkbox", "id": "show_trust", "label": "Show rating", "default": true },
+    { "type": "select", "id": "trust_style", "label": "Rating style", "options": [{ "value": "logo", "label": "Brand + star" }, { "value": "stars", "label": "Star boxes" }], "default": "stars" },
+    { "type": "text", "id": "trust_label", "label": "Rating label", "default": "Excellent" },
+    { "type": "text", "id": "trust_brand", "label": "Review brand", "default": "Trustpilot" },
+    { "type": "text", "id": "trust_text", "label": "Rating text", "default": "4.8/5 (1,200+ reviews)" },
+    { "type": "url", "id": "trust_link", "label": "Rating link" }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP",
+      "settings": [
+        { "type": "select", "id": "icon", "label": "Icon", "default": "truck", "options": [
+          { "value": "truck", "label": "Truck" }, { "value": "tools", "label": "Tools" }, { "value": "ruler", "label": "Ruler" }, { "value": "shield", "label": "Shield" }, { "value": "headset", "label": "Headset" }, { "value": "diamond", "label": "Diamond" }, { "value": "leaf", "label": "Leaf" }, { "value": "pin", "label": "Pin" } ] },
+        { "type": "text", "id": "text", "label": "Text", "default": "UK Wide Delivery" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "max_blocks": 5,
+  "enabled_on": { "groups": ["header"] },
+  "presets": [{ "name": "WT Announcement bar", "blocks": [{ "type": "usp" }] }]
+}
+{% endschema %}

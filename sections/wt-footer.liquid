@@ -1,0 +1,67 @@
+<footer class="wt-footer">
+  <div class="wt-container">
+    <div class="wt-footer__top" style="--cols: {{ section.blocks.size | at_least: 1 }}">
+      <div class="wt-footer__brand">
+        <a class="wt-logo" href="{{ routes.root_url }}">{{ section.settings.logo_text | default: shop.name }}<sup>®</sup></a>
+        {%- if section.settings.about != blank -%}<div class="wt-rte">{{ section.settings.about }}</div>{%- endif -%}
+        <div class="wt-footer__contact">
+          {%- if section.settings.phone != blank -%}<a href="tel:{{ section.settings.phone | remove: ' ' }}">{% render 'wt-icon', icon: 'phone' %}{{ section.settings.phone }}</a>{%- endif -%}
+          {%- if section.settings.email != blank -%}<a href="mailto:{{ section.settings.email }}">{% render 'wt-icon', icon: 'mail' %}{{ section.settings.email }}</a>{%- endif -%}
+        </div>
+      </div>
+      {%- for block in section.blocks -%}
+        <div {{ block.shopify_attributes }}>
+          <h2 class="wt-footer__title">{{ block.settings.title | default: block.settings.menu.title }}</h2>
+          <ul class="wt-footer__links">
+            {%- for link in block.settings.menu.links -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endfor -%}
+          </ul>
+        </div>
+      {%- endfor -%}
+      <div class="wt-footer__news">
+        <h2 class="wt-footer__title">{{ section.settings.news_title }}</h2>
+        <p>{{ section.settings.news_text }}</p>
+        {%- form 'customer', id: 'WtFooterNewsletter' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <label class="wt-visually-hidden" for="WtNewsEmail">{{ 'newsletter.label' | t }}</label>
+          <input id="WtNewsEmail" class="wt-input" type="email" name="contact[email]" required autocomplete="email" placeholder="{{ 'newsletter.label' | t | escape }}">
+          <button class="wt-btn wt-btn--light" type="submit">{{ section.settings.news_button }}</button>
+          {%- if form.posted_successfully? -%}<p role="status">{{ 'newsletter.success' | t }}</p>{%- endif -%}
+          {%- if form.errors -%}<p role="alert">{{ form.errors | default_errors }}</p>{%- endif -%}
+        {%- endform -%}
+      </div>
+    </div>
+    <div class="wt-footer__bottom">
+      <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ section.settings.copyright }}</span>
+      {%- if section.settings.show_payment -%}
+        <ul class="wt-footer__pay" aria-label="{{ 'sections.footer.payment' | t | escape }}">
+          {%- for type in shop.enabled_payment_types -%}<li>{{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}</li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+<style>.wt-footer__pay svg{height:2.4rem;width:auto}</style>
+{% schema %}
+{
+  "name": "WT Footer",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo text", "default": "Work-Tops" },
+    { "type": "richtext", "id": "about", "label": "About text", "default": "<p>Specialists in premium stone worktops, made to measure for homes and businesses.</p>" },
+    { "type": "text", "id": "phone", "label": "Phone", "default": "+44 20 0000 0000" },
+    { "type": "text", "id": "email", "label": "Email", "default": "hello@work-tops.com" },
+    { "type": "text", "id": "news_title", "label": "Newsletter heading", "default": "Stay inspired" },
+    { "type": "text", "id": "news_text", "label": "Newsletter text", "default": "Design ideas, new materials and exclusive offers." },
+    { "type": "text", "id": "news_button", "label": "Newsletter button", "default": "Sign up" },
+    { "type": "text", "id": "copyright", "label": "Copyright suffix", "default": "All rights reserved." },
+    { "type": "checkbox", "id": "show_payment", "label": "Show payment icons", "default": true }
+  ],
+  "blocks": [
+    { "type": "menu", "name": "Menu column", "settings": [
+      { "type": "text", "id": "title", "label": "Heading" },
+      { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" }
+    ] }
+  ],
+  "max_blocks": 4,
+  "enabled_on": { "groups": ["footer"] }
+}
+{% endschema %}

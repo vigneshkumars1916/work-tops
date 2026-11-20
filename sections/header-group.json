@@ -2,53 +2,21 @@
   "name": "t:sections.header.name",
   "type": "header",
   "sections": {
-    "announcement-bar": {
-      "type": "announcement-bar",
-      "settings": {
-        "color_scheme": "scheme-1",
-        "show_line_separator": true,
-        "show_social": false,
-        "auto_rotate": false,
-        "change_slides_speed": 5,
-        "enable_country_selector": false,
-        "enable_language_selector": false
-      },
+    "wt-announcement": {
+      "type": "wt-announcement",
       "blocks": {
-        "announcement-bar-0": {
-          "type": "announcement",
-          "settings": {
-            "text": "Welcome to our store",
-            "text_alignment": "center",
-            "color_scheme": "scheme-1",
-            "link": ""
-          }
-        }
+        "usp1": { "type": "usp", "settings": { "icon": "truck", "text": "UK Wide Delivery", "link": "" } },
+        "usp2": { "type": "usp", "settings": { "icon": "tools", "text": "Made to Measure", "link": "" } },
+        "usp3": { "type": "usp", "settings": { "icon": "shield", "text": "10-Year Warranty", "link": "" } },
+        "usp4": { "type": "usp", "settings": { "icon": "headset", "text": "Expert Support", "link": "" } }
       },
-      "block_order": [
-        "announcement-bar-0"
-      ]
+      "block_order": ["usp1", "usp2", "usp3", "usp4"],
+      "settings": { "show_trust": true, "trust_style": "stars", "trust_label": "Excellent", "trust_brand": "Trustpilot", "trust_text": "4.8/5 (1,200+ reviews)" }
     },
-    "header": {
-      "type": "header",
-      "settings": {
-        "color_scheme": "scheme-1",
-        "menu_color_scheme": "scheme-1",
-        "logo_position": "middle-left",
-        "menu": "main-menu",
-        "menu_type_desktop": "dropdown",
-        "sticky_header_type": "on-scroll-up",
-        "show_line_separator": true,
-        "enable_country_selector": true,
-        "enable_language_selector": true,
-        "mobile_logo_position": "center",
-        "margin_bottom": 0,
-        "padding_top": 20,
-        "padding_bottom": 20
-      }
+    "wt-header": {
+      "type": "wt-header",
+      "settings": { "menu": "main-menu", "mega_item": "Worktops", "logo_text": "Work-Tops", "logo_mark": true, "cta_label": "Request a Quote", "cta_link": "shopify://pages/request-a-quote", "sticky": true }
     }
   },
-  "order": [
-    "announcement-bar",
-    "header"
-  ]
+  "order": ["wt-announcement", "wt-header"]
 }

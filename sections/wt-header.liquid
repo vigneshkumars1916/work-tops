@@ -1,0 +1,168 @@
+<script src="{{ 'wt-header.js' | asset_url }}" defer></script>
+{%- liquid
+  assign menu = section.settings.menu
+  assign mega_title = section.settings.mega_item | downcase | strip
+-%}
+<div class="wt-header-wrap" data-wt-header>
+  <header class="wt-container wt-header">
+    <button type="button" class="wt-iconbtn wt-burger" aria-controls="WtDrawer" aria-expanded="false" data-wt-drawer-open>
+      {%- render 'wt-icon', icon: 'menu' -%}<span class="wt-visually-hidden">{{ section.settings.menu_label }}</span>
+    </button>
+    <a href="{{ routes.root_url }}" class="wt-logo" aria-label="{{ shop.name | escape }} home">
+      {%- if section.settings.logo != blank -%}
+        {%- assign logo_h = section.settings.logo_width | divided_by: section.settings.logo.aspect_ratio | round -%}
+        {{ section.settings.logo | image_url: width: 600 | image_tag: width: section.settings.logo_width, height: logo_h, alt: shop.name, loading: 'eager', widths: '200, 300, 400, 600', sizes: '200px' }}
+      {%- else -%}
+        {{ section.settings.logo_text | default: shop.name }}{% if section.settings.logo_mark %}<sup>®</sup>{% endif %}
+      {%- endif -%}
+    </a>
+
+    <nav class="wt-nav" aria-label="{{ section.settings.nav_label | escape }}">
+      <ul class="wt-nav__list">
+        {%- for link in menu.links -%}
+          {%- liquid
+            assign is_mega = false
+            assign t = link.title | downcase | strip
+            if t == mega_title
+              assign is_mega = true
+            endif
+          -%}
+          <li class="wt-nav__item{% unless is_mega %} wt-nav__item--drop{% endunless %}">
+            {%- if link.links.size > 0 -%}
+              <button type="button" class="wt-nav__link" aria-expanded="false" aria-controls="WtMenu-{{ forloop.index }}" data-wt-menu-toggle>
+                {{ link.title }}{% render 'wt-icon', icon: 'chevron-down' %}
+              </button>
+              {%- if is_mega -%}
+                <div class="wt-mega" id="WtMenu-{{ forloop.index }}" hidden data-wt-menu-panel>
+                  <div class="wt-container wt-mega__inner">
+                    <div>
+                      <p class="wt-mega__title">{{ link.title }}</p>
+                      <ul class="wt-mega__links">
+                        {%- for child in link.links -%}<li><a href="{{ child.url }}"{% if child.current %} aria-current="page"{% endif %}>{{ child.title }}</a></li>{%- endfor -%}
+                        <li><a href="{{ link.url }}"><strong>{{ section.settings.view_all_label }} {{ link.title | downcase }}</strong></a></li>
+                      </ul>
+                    </div>
+                    <div class="wt-mega__cols">
+                      {%- for child in link.links limit: 6 -%}
+                        {%- assign col_img = child.object.featured_image | default: child.object.image -%}
+                        <a class="wt-mega__card" href="{{ child.url }}" tabindex="-1">
+                          <div class="wt-media">
+                            {%- if col_img != blank -%}{% render 'wt-image', image: col_img, sizes: '220px', widths: '220, 440' %}{%- else -%}{{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}{%- endif -%}
+                          </div>
+                          <span>{{ child.title }}{% render 'wt-icon', icon: 'arrow-right', size: 16 %}</span>
+                        </a>
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                </div>
+              {%- else -%}
+                <div class="wt-dropdown" id="WtMenu-{{ forloop.index }}" hidden data-wt-menu-panel>
+                  <ul class="wt-mega__links">
+                    {%- for child in link.links -%}<li><a href="{{ child.url }}"{% if child.current %} aria-current="page"{% endif %}>{{ child.title }}</a></li>{%- endfor -%}
+                  </ul>
+                </div>
+              {%- endif -%}
+            {%- else -%}
+              <a class="wt-nav__link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title }}</a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="wt-header__icons">
+      <button type="button" class="wt-iconbtn" data-wt-search-open aria-haspopup="dialog">
+        {%- render 'wt-icon', icon: 'search' -%}<span class="wt-visually-hidden">{{ 'general.search.search' | t }}</span>
+      </button>
+      {%- if shop.customer_accounts_enabled -%}
+        <a class="wt-iconbtn wt-header__icon--account" href="{{ routes.account_url }}">
+          {%- render 'wt-icon', icon: 'account' -%}<span class="wt-visually-hidden">{{ 'customer.account_fallback' | t }}</span>
+        </a>
+      {%- endif -%}
+      <a href="{{ routes.cart_url }}" class="wt-iconbtn" id="cart-icon-bubble">
+        {%- render 'wt-icon', icon: 'cart' -%}
+        <span class="wt-visually-hidden">{{ 'templates.cart.cart' | t }}</span>
+        <span class="wt-cart-count" aria-hidden="true">{{ cart.item_count | at_most: 99 }}</span>
+        <span class="wt-visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+      </a>
+    </div>
+    {%- if section.settings.cta_label != blank -%}
+      <a class="wt-btn wt-btn--sm wt-header__cta" href="{{ section.settings.cta_link | default: '#' }}">{{ section.settings.cta_label }}</a>
+    {%- endif -%}
+  </header>
+</div>
+
+<div class="wt-drawer" id="WtDrawer" hidden data-wt-drawer role="dialog" aria-modal="true" aria-label="{{ section.settings.menu_label | escape }}">
+  <div class="wt-drawer__overlay" data-wt-drawer-close></div>
+  <div class="wt-drawer__panel">
+    <div class="wt-drawer__head">
+      <span class="wt-logo">{{ section.settings.logo_text | default: shop.name }}</span>
+      <button type="button" class="wt-iconbtn" data-wt-drawer-close>{% render 'wt-icon', icon: 'close' %}<span class="wt-visually-hidden">{{ 'accessibility.close' | t }}</span></button>
+    </div>
+    <ul class="wt-drawer__nav">
+      {%- for link in menu.links -%}
+        <li>
+          {%- if link.links.size > 0 -%}
+            <button type="button" class="wt-drawer__toggle" aria-expanded="false" aria-controls="WtDrawerSub-{{ forloop.index }}" data-wt-sub-toggle>{{ link.title }}{% render 'wt-icon', icon: 'chevron-down', size: 18 %}</button>
+            <ul class="wt-drawer__sub" id="WtDrawerSub-{{ forloop.index }}" hidden>
+              {%- for child in link.links -%}<li><a href="{{ child.url }}">{{ child.title }}</a></li>{%- endfor -%}
+              <li><a href="{{ link.url }}"><strong>{{ section.settings.view_all_label }}</strong></a></li>
+            </ul>
+          {%- else -%}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+    <div class="wt-drawer__foot">
+      {%- if section.settings.cta_label != blank -%}<a class="wt-btn wt-btn--block" href="{{ section.settings.cta_link | default: '#' }}">{{ section.settings.cta_label }}</a>{%- endif -%}
+      {%- if shop.customer_accounts_enabled -%}<a class="wt-btn wt-btn--outline wt-btn--block" href="{{ routes.account_url }}">{{ 'customer.account_fallback' | t }}</a>{%- endif -%}
+    </div>
+  </div>
+</div>
+
+<dialog class="wt-dialog" id="WtSearch" aria-label="{{ 'general.search.search' | t | escape }}">
+  <div class="wt-dialog__inner">
+    <form action="{{ routes.search_url }}" method="get" role="search" class="wt-search-form">
+      <label for="WtSearchInput" class="wt-visually-hidden">{{ 'general.search.search' | t }}</label>
+      <input id="WtSearchInput" class="wt-input" type="search" name="q" placeholder="{{ section.settings.search_placeholder | escape }}" autocomplete="off">
+      <input type="hidden" name="type" value="product,article,page">
+      <button class="wt-btn" type="submit">{% render 'wt-icon', icon: 'search' %}<span class="wt-visually-hidden">{{ 'general.search.search' | t }}</span></button>
+    </form>
+  </div>
+  <form method="dialog"><button class="wt-iconbtn wt-dialog__close">{% render 'wt-icon', icon: 'close' %}<span class="wt-visually-hidden">{{ 'accessibility.close' | t }}</span></button></form>
+</dialog>
+
+<style>
+  .wt-nav__item--drop{position:relative}
+  .wt-dropdown{position:absolute;left:0;top:calc(100% + 1.6rem);min-width:24rem;background:#fff;border:1px solid var(--wt-line);border-radius:var(--wt-radius-sm);box-shadow:var(--wt-shadow);padding:1.2rem 2rem;z-index:30}
+  .wt-dropdown[hidden]{display:none}
+  .wt-header-wrap{position:{% if section.settings.sticky %}sticky{% else %}relative{% endif %}}
+  .wt-header-wrap .wt-mega{top:100%}
+</style>
+
+{% schema %}
+{
+  "name": "WT Header",
+  "class": "wt-header-section",
+  "settings": [
+    { "type": "header", "content": "Logo" },
+    { "type": "image_picker", "id": "logo", "label": "Logo image" },
+    { "type": "range", "id": "logo_width", "label": "Logo width", "min": 80, "max": 260, "step": 5, "unit": "px", "default": 150 },
+    { "type": "text", "id": "logo_text", "label": "Logo text (when no image)", "default": "Work-Tops" },
+    { "type": "checkbox", "id": "logo_mark", "label": "Show ® mark", "default": true },
+    { "type": "header", "content": "Navigation" },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "text", "id": "mega_item", "label": "Menu item shown as mega menu", "default": "Worktops", "info": "Top-level title. Other items with children show a compact dropdown." },
+    { "type": "text", "id": "view_all_label", "label": "View all label", "default": "View all" },
+    { "type": "text", "id": "nav_label", "label": "Navigation accessible label", "default": "Main" },
+    { "type": "text", "id": "menu_label", "label": "Mobile menu label", "default": "Menu" },
+    { "type": "checkbox", "id": "sticky", "label": "Sticky header", "default": true },
+    { "type": "text", "id": "search_placeholder", "label": "Search placeholder", "default": "Search worktops, tiles, sinks..." },
+    { "type": "header", "content": "Call to action" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Request a Quote" },
+    { "type": "url", "id": "cta_link", "label": "Button link" }
+  ],
+  "enabled_on": { "groups": ["header"] }
+}
+{% endschema %}
