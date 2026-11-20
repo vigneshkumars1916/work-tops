@@ -1,0 +1,4 @@
+{%- comment -%} Cart-level guard message. Pair with the same capture on the checkout button. {%- endcomment -%}
+{%- capture wt_errs -%}{%- for item in cart.items -%}{%- render 'wt-line-check', item: item -%}{%- endfor -%}{%- endcapture -%}
+{%- assign wt_errs = wt_errs | strip -%}
+{%- if wt_errs != blank -%}<p class="wt-cart-error" id="WtCartError" role="alert">Some made-to-measure items need attention before you can check out.</p>{%- endif -%}

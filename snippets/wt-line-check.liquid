@@ -1,0 +1,42 @@
+{%- comment -%}
+  Server-side (Liquid) validation of a made-to-measure cart line. Outputs an error message, or nothing when valid.
+  Rules: Length/Width properties present, whole mm, inside product min/max, and
+  quantity (billable 0.01 m2 units) must be a whole multiple of ceil(L x W / 10,000).
+  Price is quantity x variant price, so editing properties or quantity in the browser
+  cannot lower the price without making the line invalid (and blocking checkout).
+  @param item - cart line item
+{%- endcomment -%}
+{%- liquid
+  assign p = item.product
+  assign wt_is_mtm = p.metafields.custom.made_to_measure.value
+  assign mf = p.metafields.custom
+  assign min_l = mf.min_length_mm.value | default: 300
+  assign max_l = mf.max_length_mm.value | default: 3200
+  assign min_w = mf.min_width_mm.value | default: 300
+  assign max_w = mf.max_width_mm.value | default: 1600
+  assign raw_l = item.properties['Length (mm)'] | strip
+  assign raw_w = item.properties['Width (mm)'] | strip
+  assign l = raw_l | plus: 0
+  assign w = raw_w | plus: 0
+  assign l_int = l | round
+  assign w_int = w | round
+  assign l_str = l_int | append: ''
+  assign w_str = w_int | append: ''
+-%}
+{%- if wt_is_mtm != true -%}
+{%- elsif raw_l == blank or raw_w == blank -%}
+  Missing dimensions.
+{%- elsif l_str != raw_l or w_str != raw_w -%}
+  Dimensions must be whole millimetres.
+{%- elsif l < min_l or l > max_l -%}
+  Length must be between {{ min_l }} and {{ max_l }} mm.
+{%- elsif w < min_w or w > max_w -%}
+  Width must be between {{ min_w }} and {{ max_w }} mm.
+{%- else -%}
+  {%- liquid
+    assign mm2 = l | times: w
+    assign units = mm2 | plus: 9999 | divided_by: 10000
+    assign rem = item.quantity | modulo: units
+  -%}
+  {%- if rem != 0 -%}Quantity doesn't match the dimensions.{%- endif -%}
+{%- endif -%}

@@ -177,6 +177,7 @@
                         <p class="product-option">{{ item.selling_plan_allocation.selling_plan.name }}</p>
                       {%- endif -%}
 
+                          {%- render 'wt-line-mtm', item: item -%}
                       <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
                         {%- for discount in item.line_level_discount_allocations -%}
                           <li class="discounts__discount">
@@ -229,7 +230,7 @@
                         assign has_vol_pricing = true
                       endif
                     -%}
-                    <td class="cart-item__quantity{% if has_qty_rules or has_vol_pricing %} cart-item__quantity--info{% endif %}">
+                    <td class="cart-item__quantity{% if item.product.metafields.custom.made_to_measure.value %} wt-mtm-qty{% endif %}{% if has_qty_rules or has_vol_pricing %} cart-item__quantity--info{% endif %}">
                       <quantity-popover>
                         <div class="cart-item__quantity-wrapper quantity-popover-wrapper">
                           <label class="visually-hidden" for="Quantity-{{ item.index | plus: 1 }}">

@@ -1,0 +1,21 @@
+{%- doc -%}
+  Made-to-measure line details (price per m2, area, pieces) and validation error, for cart page and drawer.
+  @param {object} item - cart line item
+{%- enddoc -%}
+{%- if item.product.metafields.custom.made_to_measure.value -%}
+  {%- capture err -%}{%- render 'wt-line-check', item: item -%}{%- endcapture -%}
+  {%- assign err = err | strip -%}
+  {%- liquid
+    assign l = item.properties['Length (mm)'] | plus: 0
+    assign w = item.properties['Width (mm)'] | plus: 0
+    assign mm2 = l | times: w
+    assign units = mm2 | plus: 9999 | divided_by: 10000 | at_least: 1
+    assign pieces = item.quantity | divided_by: units
+    assign area = units | divided_by: 100.0
+  -%}
+  <p class="product-option wt-line-mtm">
+    {{ item.final_price | times: 100 | money }} / m²
+    {%- if err == blank %} &middot; {{ area | round: 2 }} m² &times; {{ pieces }} {% if pieces == 1 %}piece{% else %}pieces{% endif %}{% endif -%}
+  </p>
+  {%- if err != blank -%}<p class="wt-line-error" role="alert">{{ err }} Please remove this item and add it again from the product page.</p>{%- endif -%}
+{%- endif -%}

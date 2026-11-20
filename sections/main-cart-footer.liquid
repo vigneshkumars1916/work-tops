@@ -104,12 +104,14 @@
                 </small>
               </div>
             {%- else -%}
+{%- capture wt_errs -%}{%- for item in cart.items -%}{%- render 'wt-line-check', item: item -%}{%- endfor -%}{%- endcapture -%}{%- assign wt_errs = wt_errs | strip -%}
+{%- render 'wt-cart-guard' -%}
               <div class="cart__ctas" {{ block.shopify_attributes }}>
                 <button
                   type="submit"
                   id="checkout"
                   class="cart__checkout-button button"
-                  name="checkout"
+                  name="checkout"{% if wt_errs != blank %} disabled aria-describedby="WtCartError"{% endif %}
                   {% if cart == empty %}
                     disabled
                   {% endif %}
@@ -119,7 +121,7 @@
                 </button>
               </div>
 
-              {%- if additional_checkout_buttons -%}
+              {%- if additional_checkout_buttons and wt_errs == blank -%}
                 <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
                   {{ content_for_additional_checkout_buttons }}
                 </div>

@@ -230,6 +230,7 @@
                             <p class="product-option">{{ item.selling_plan_allocation.selling_plan.name }}</p>
                           {%- endif -%}
 
+                          {%- render 'wt-line-mtm', item: item -%}
                           <ul
                             class="discounts list-unstyled"
                             role="list"
@@ -288,7 +289,7 @@
                           endif
                         -%}
                         <td
-                          class="cart-item__quantity {% if has_qty_rules or has_vol_pricing %} cart-item__quantity--info{% endif %}"
+                          class="cart-item__quantity{% if item.product.metafields.custom.made_to_measure.value %} wt-mtm-qty{% endif %} {% if has_qty_rules or has_vol_pricing %} cart-item__quantity--info{% endif %}"
                           role="cell"
                           headers="CartDrawer-ColumnQuantity"
                         >
@@ -574,12 +575,14 @@
 
         <!-- CTAs -->
 
+{%- capture wt_errs -%}{%- for item in cart.items -%}{%- render 'wt-line-check', item: item -%}{%- endfor -%}{%- endcapture -%}{%- assign wt_errs = wt_errs | strip -%}
+{%- render 'wt-cart-guard' -%}
         <div class="cart__ctas" {{ block.shopify_attributes }}>
           <button
             type="submit"
             id="CartDrawer-Checkout"
             class="cart__checkout-button button"
-            name="checkout"
+            name="checkout"{% if wt_errs != blank %} disabled aria-describedby="WtCartError"{% endif %}
             form="CartDrawer-Form"
             {% if cart == empty %}
               disabled
