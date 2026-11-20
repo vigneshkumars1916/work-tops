@@ -1,0 +1,56 @@
+{%- comment -%}
+  Canonical + robots rules.
+  Collections: unfiltered = self canonical (page 2+ keeps ?page=n).
+  Exactly one filter value whose param is listed in collection metafield custom.seo_indexable_filters
+  (e.g. filter.p.m.custom.colour), page 1, default sort = indexable, self canonical.
+  Anything else (multi-filter, price, availability, sort, tags) = noindex,follow + canonical to the clean collection URL.
+{%- endcomment -%}
+{%- liquid
+  assign wt_canonical = canonical_url
+  assign wt_robots = ''
+  if request.page_type == 'collection' and collection
+    assign base = shop.url | append: collection.url
+    assign active_count = 0
+    assign active_param = ''
+    assign active_value = ''
+    for f in collection.filters
+      for v in f.active_values
+        assign active_count = active_count | plus: 1
+        assign active_param = v.param_name
+        assign active_value = v.value
+      endfor
+      if f.type == 'price_range'
+        if f.min_value.value != nil or f.max_value.value != nil
+          assign active_count = active_count | plus: 2
+        endif
+      endif
+    endfor
+    assign sorted = false
+    if collection.sort_by != blank and collection.sort_by != collection.default_sort_by
+      assign sorted = true
+    endif
+    assign allowed = collection.metafields.custom.seo_indexable_filters.value
+    if current_tags
+      assign wt_robots = 'noindex, follow'
+      assign wt_canonical = base
+    elsif active_count == 0
+      if sorted
+        assign wt_robots = 'noindex, follow'
+        assign wt_canonical = base
+      elsif current_page > 1
+        assign wt_canonical = base | append: '?page=' | append: current_page
+      else
+        assign wt_canonical = base
+      endif
+    elsif active_count == 1 and allowed contains active_param and sorted == false and current_page == 1
+      assign wt_canonical = base | append: '?' | append: active_param | append: '=' | append: active_value | url_escape
+    else
+      assign wt_robots = 'noindex, follow'
+      assign wt_canonical = base
+    endif
+  elsif request.page_type == 'search' or request.page_type == 'cart' or request.page_type == 'captcha'
+    assign wt_robots = 'noindex, follow'
+  endif
+-%}
+<link rel="canonical" href="{{ wt_canonical }}">
+{%- if wt_robots != blank -%}<meta name="robots" content="{{ wt_robots }}">{%- endif -%}

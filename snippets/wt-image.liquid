@@ -1,0 +1,24 @@
+{%- doc -%}
+  Responsive image with srcset/sizes, explicit width/height (no CLS), lazy by default.
+  @param {image} image - Shopify image object
+  @param {string} [sizes] - sizes attribute, default 100vw
+  @param {string} [class]
+  @param {boolean} [eager] - true for above-the-fold (LCP) images
+  @param {string} [alt]
+  @param {string} [widths] - comma list of widths
+{%- enddoc -%}
+{%- liquid
+  assign w = widths | default: '360, 540, 720, 960, 1200, 1500, 1920'
+  assign sz = sizes | default: '100vw'
+  assign a = alt | default: image.alt | escape
+  if eager
+    assign loading = 'eager'
+  else
+    assign loading = 'lazy'
+  endif
+-%}
+{%- if eager -%}
+  {{ image | image_url: width: 1920 | image_tag: widths: w, sizes: sz, class: class, alt: a, loading: loading, fetchpriority: 'high', decoding: 'async' }}
+{%- else -%}
+  {{ image | image_url: width: 1920 | image_tag: widths: w, sizes: sz, class: class, alt: a, loading: loading, decoding: 'async' }}
+{%- endif -%}

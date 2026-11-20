@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="">
-    <link rel="canonical" href="{{ canonical_url }}">
+    {% render 'wt-seo' %}
 
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
@@ -54,9 +54,7 @@
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'cart-disclosure-modal.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'cart-disclosure-tooltip.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'details-disclosure.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'details-modal.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'search-form.js' | asset_url }}" defer="defer"></script>
+    {%- if request.page_type == 'search' -%}<script src="{{ 'search-form.js' | asset_url }}" defer="defer"></script>{%- endif -%}
     <script src="{{ 'standard-actions-override.js' | asset_url }}" defer="defer"></script>
 
     {%- if settings.animations_reveal_on_scroll -%}
@@ -77,6 +75,9 @@
       {{ body_font_italic | font_face: font_display: 'swap' }}
       {{ body_font_bold_italic | font_face: font_display: 'swap' }}
       {{ settings.type_header_font | font_face: font_display: 'swap' }}
+      {%- assign wt_h500 = settings.type_header_font | font_modify: 'weight', '500' -%}{%- if wt_h500 -%}{{ wt_h500 | font_face: font_display: 'swap' }}{%- endif -%}
+      {%- assign wt_b500 = settings.type_body_font | font_modify: 'weight', '500' -%}{%- if wt_b500 -%}{{ wt_b500 | font_face: font_display: 'swap' }}{%- endif -%}
+      {%- assign wt_b600 = settings.type_body_font | font_modify: 'weight', '600' -%}{%- if wt_b600 -%}{{ wt_b600 | font_face: font_display: 'swap' }}{%- endif -%}
 
       {% for scheme in settings.color_schemes -%}
         {% assign scheme_classes = scheme_classes | append: ', .color-' | append: scheme.id %}
@@ -279,6 +280,7 @@
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'wt-base.css' | asset_url | stylesheet_tag }}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}
