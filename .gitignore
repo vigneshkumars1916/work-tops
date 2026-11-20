@@ -1,0 +1,15 @@
+# Shopify CLI
+.shopify/
+config.yml
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Dependencies and local tooling
+node_modules/
+*.log
+.env
