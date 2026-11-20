@@ -1,0 +1,76 @@
+{%- comment -%}
+  Title and meta description.
+  The SEO title and description set in the admin always win. Without them:
+  - Product: "<title> <type> | Made to Measure" for made-to-measure products, "<title> | <type>" otherwise;
+    description from the tagline plus the size and edge options.
+  - Collection: an indexable single-filter URL (see wt-seo) gets its own title and description,
+    e.g. "White Quartz Worktops". Pagination and tags are appended so every URL has a unique title.
+{%- endcomment -%}
+{%- liquid
+  assign t = page_title
+  assign d = page_description
+  case request.page_type
+    when 'product'
+      if product.metafields.global.title_tag == blank
+        if product.metafields.custom.made_to_measure.value
+          assign t = product.title | append: ' Worktops | Made to Measure'
+        elsif product.type != blank
+          assign t = product.title | append: ' | ' | append: product.type
+        endif
+      endif
+      if product.metafields.global.description_tag == blank
+        assign tagline = product.metafields.custom.tagline.value
+        if product.metafields.custom.made_to_measure.value
+          assign thick = ''
+          for opt in product.options_with_values
+            if opt.name == 'Thickness'
+              for val in opt.values
+                if forloop.first
+                  assign thick = val.name
+                else
+                  assign thick = thick | append: ' or ' | append: val.name
+                endif
+              endfor
+            endif
+          endfor
+          assign d = tagline | append: ' Made-to-measure ' | append: product.title | append: ' worktops'
+          if thick != blank
+            assign d = d | append: ' in ' | append: thick
+          endif
+          assign d = d | append: ', cut to your exact size with an instant online price.'
+          assign d = d | strip
+        elsif tagline != blank
+          assign d = tagline | append: ' ' | append: product.description | strip_html | truncate: 155
+        endif
+      endif
+    when 'collection'
+      assign active_count = 0
+      assign label = ''
+      for f in collection.filters
+        for v in f.active_values
+          assign active_count = active_count | plus: 1
+          assign label = v.label
+          assign param = v.param_name
+        endfor
+        if f.type == 'price_range'
+          if f.min_value.value != nil or f.max_value.value != nil
+            assign active_count = active_count | plus: 2
+          endif
+        endif
+      endfor
+      assign allowed = collection.metafields.custom.seo_indexable_filters.value
+      if active_count == 1 and allowed contains param
+        assign t = label | append: ' ' | append: collection.title
+        assign d = label | append: ' ' | append: collection.title | downcase | prepend: 'Shop ' | append: ', cut to your exact size. Compare finishes and thicknesses and get an instant price online.'
+      endif
+  endcase
+-%}
+<title>
+  {{- t -}}
+  {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+  {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+  {%- unless t contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+</title>
+{%- if d != blank %}
+<meta name="description" content="{{ d | strip_html | strip_newlines | truncate: 160 | escape }}">
+{%- endif %}
