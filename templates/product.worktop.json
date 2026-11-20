@@ -1,0 +1,81 @@
+{
+  "sections": {
+    "main": {
+      "type": "wt-main-product",
+      "blocks": {
+        "header": {
+          "type": "header",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_sample": true,
+            "sample_label": "Order a Free Sample"
+          }
+        },
+        "config": {
+          "type": "configurator",
+          "settings": {
+            "title": "Made to Measure – Get an Instant Price",
+            "default_length": 2400,
+            "default_width": 600
+          }
+        },
+        "buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_quote": true,
+            "quote_label": "Request a Free Quote"
+          }
+        },
+        "assure": {
+          "type": "assurance",
+          "settings": {
+            "features": [
+              "uk-wide-delivery",
+              "10-year-warranty",
+              "custom-sizes"
+            ]
+          }
+        }
+      },
+      "block_order": [
+        "header",
+        "price",
+        "config",
+        "buy",
+        "assure"
+      ],
+      "settings": {
+        "min_length": 300,
+        "max_length": 3200,
+        "min_width": 300,
+        "max_width": 1600,
+        "show_props": true,
+        "properties": [
+          "non-porous",
+          "stain-resistant",
+          "scratch-resistant",
+          "heat-resistant"
+        ],
+        "features_default": "Durable, non-porous and easy to clean\nSuitable for kitchens, bathrooms and commercial spaces\nAvailable in custom sizes with multiple edge profiles",
+        "care_default": "<p>Wipe daily with a soft cloth, warm water and a mild pH-neutral detergent. Use trivets for hot pans and chopping boards for cutting.</p>",
+        "gallery_start": 1
+      }
+    },
+    "project": {
+      "type": "wt-complete-project",
+      "settings": {
+        "collection": "accessories",
+        "heading": "Complete Your Project",
+        "link_label": "View All Accessories",
+        "link_url": "shopify://collections/accessories"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "project"
+  ]
+}

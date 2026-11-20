@@ -1,0 +1,287 @@
+{{ 'wt-product.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'wt-product.js' | asset_url }}" defer></script>
+{%- liquid
+  assign v = product.selected_or_first_available_variant
+  assign mf = product.metafields.custom
+  assign mtm = mf.made_to_measure.value
+  assign min_l = mf.min_length_mm.value | default: section.settings.min_length
+  assign max_l = mf.max_length_mm.value | default: section.settings.max_length
+  assign min_w = mf.min_width_mm.value | default: section.settings.min_width
+  assign max_w = mf.max_width_mm.value | default: section.settings.max_width
+  assign props = mf.properties.value | default: section.settings.properties
+  assign fid = 'WtProductForm-' | append: section.id
+  assign media_count = product.media.size
+  assign g_start = 0
+  if section.settings.gallery_start > 0 and media_count > section.settings.gallery_start
+    assign g_start = section.settings.gallery_start
+  endif
+-%}
+<div class="wt-container wt-pdp" data-wt-pdp data-section-id="{{ section.id }}">
+  {% render 'wt-breadcrumbs' %}
+  <div class="wt-pdp__grid">
+    <div class="wt-pdp__gal">
+      <div class="wt-gal{% if media_count < 2 %} wt-gal--single{% endif %}" data-wt-gallery data-start="{{ g_start }}">
+        {%- if media_count > 1 -%}
+          <ul class="wt-gal__thumbs" aria-label="Product images">
+            {%- for m in product.media -%}
+              <li><button type="button" class="wt-gal__thumb" data-index="{{ forloop.index0 }}"{% if forloop.index0 == g_start %} aria-current="true"{% endif %} aria-label="Show image {{ forloop.index }} of {{ media_count }}">
+                {{ m.preview_image | image_url: width: 180 | image_tag: loading: 'lazy', width: 84, height: 74, alt: '' }}
+                {%- if m.media_type == 'video' or m.media_type == 'external_video' -%}<span class="wt-gal__play"><span>{% render 'wt-icon', icon: 'play' %}</span></span>{%- endif -%}
+              </button></li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+        <div class="wt-gal__main">
+          <div class="wt-gal__stage">
+            {%- for m in product.media -%}
+              <div class="wt-gal__slide" data-index="{{ forloop.index0 }}"{% unless forloop.index0 == g_start %} hidden{% endunless %}>
+                {%- case m.media_type -%}
+                  {%- when 'image' -%}{%- assign m_alt = m.alt | default: product.title -%}
+                    {%- if forloop.index0 == g_start -%}{% render 'wt-image', image: m, sizes: '(min-width: 990px) 46vw, 100vw', eager: true, alt: m_alt %}{%- else -%}{% render 'wt-image', image: m, sizes: '(min-width: 990px) 46vw, 100vw', alt: m_alt %}{%- endif -%}
+                  {%- when 'video' -%}{{ m | video_tag: controls: true, preload: 'none', playsinline: true }}
+                  {%- when 'external_video' -%}{{ m | external_video_tag: loading: 'lazy' }}
+                  {%- else -%}{{ m | media_tag }}
+                {%- endcase -%}
+              </div>
+            {%- else -%}
+              <div class="wt-gal__slide">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+            {%- endfor -%}
+            {%- if media_count > 1 -%}
+              <button type="button" class="wt-gal__nav wt-gal__nav--prev" data-dir="-1" aria-label="Previous image">{% render 'wt-icon', icon: 'chevron-left' %}</button>
+              <button type="button" class="wt-gal__nav wt-gal__nav--next" data-dir="1" aria-label="Next image">{% render 'wt-icon', icon: 'chevron-right' %}</button>
+            {%- endif -%}
+            {%- if product.featured_image -%}<button type="button" class="wt-gal__zoom" aria-label="Zoom image" aria-haspopup="dialog" data-wt-zoom>{% render 'wt-icon', icon: 'zoom' %}</button>{%- endif -%}
+          </div>
+          {%- if media_count > 1 -%}<div class="wt-gal__dots" aria-hidden="true">{% for m in product.media %}<span{% if forloop.index0 == g_start %} aria-current="true"{% endif %}></span>{% endfor %}</div>{%- endif -%}
+        </div>
+      </div>
+      <dialog class="wt-dialog wt-zoom" data-wt-zoom-dialog aria-label="Zoomed image">
+        <form method="dialog"><button class="wt-iconbtn wt-dialog__close" style="background:#fff">{% render 'wt-icon', icon: 'close' %}<span class="wt-visually-hidden">{{ 'accessibility.close' | t }}</span></button></form>
+        <img alt="" data-wt-zoom-img width="1600" height="1600" loading="lazy">
+      </dialog>
+
+    </div>
+    <div class="wt-pdp__det">
+      {%- if section.settings.show_props and props != blank -%}
+        <ul class="wt-props">
+          {%- for p in props limit: 4 -%}<li>{% render 'wt-icon', icon: p.icon.value %}<span>{{ p.title.value | replace: ' & ', ' &amp;<br>' }}</span></li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      <div class="wt-tabs" data-wt-tabs>
+        <div class="wt-tabs__list" role="tablist" aria-label="Product information">
+          <button type="button" role="tab" class="wt-tab" id="tab-desc-{{ section.id }}" aria-selected="true" aria-controls="panel-desc-{{ section.id }}">{{ section.settings.tab_desc }}</button>
+          {%- if mf.specifications != blank -%}<button type="button" role="tab" class="wt-tab" id="tab-spec-{{ section.id }}" aria-selected="false" aria-controls="panel-spec-{{ section.id }}" tabindex="-1">{{ section.settings.tab_spec }}</button>{%- endif -%}
+          {%- if mf.care != blank or section.settings.care_default != blank -%}<button type="button" role="tab" class="wt-tab" id="tab-care-{{ section.id }}" aria-selected="false" aria-controls="panel-care-{{ section.id }}" tabindex="-1">{{ section.settings.tab_care }}</button>{%- endif -%}
+          {%- if section.settings.delivery != blank -%}<button type="button" role="tab" class="wt-tab" id="tab-del-{{ section.id }}" aria-selected="false" aria-controls="panel-del-{{ section.id }}" tabindex="-1">{{ section.settings.tab_delivery }}</button>{%- endif -%}
+        </div>
+        <div class="wt-tabpanel wt-rte" role="tabpanel" id="panel-desc-{{ section.id }}" aria-labelledby="tab-desc-{{ section.id }}" tabindex="0">
+          {{ product.description }}
+          {%- assign feats = mf.key_features.value -%}
+          {%- if feats == blank and section.settings.features_default != blank -%}{%- assign feats = section.settings.features_default | newline_to_br | split: '<br />' -%}{%- endif -%}
+          {%- if feats != blank -%}<ul class="wt-checklist">{% for f in feats %}{% assign ff = f | strip %}{% if ff != blank %}<li>{% render 'wt-icon', icon: 'check-circle' %}{{ ff }}</li>{% endif %}{% endfor %}</ul>{%- endif -%}
+        </div>
+        {%- if mf.specifications != blank -%}
+          <div class="wt-tabpanel" role="tabpanel" id="panel-spec-{{ section.id }}" aria-labelledby="tab-spec-{{ section.id }}" tabindex="0" hidden>
+            <table class="wt-specs"><caption class="wt-visually-hidden">Specifications</caption><tbody>
+              {%- assign lines = mf.specifications.value | newline_to_br | split: '<br />' -%}
+              {%- for line in lines -%}{%- assign parts = line | strip | split: ':' -%}{%- if parts.size > 1 -%}<tr><th scope="row">{{ parts[0] | strip }}</th><td>{{ line | strip | remove_first: parts[0] | remove_first: ':' | strip }}</td></tr>{%- endif -%}{%- endfor -%}
+            </tbody></table>
+          </div>
+        {%- endif -%}
+        {%- if mf.care != blank or section.settings.care_default != blank -%}
+          <div class="wt-tabpanel wt-rte" role="tabpanel" id="panel-care-{{ section.id }}" aria-labelledby="tab-care-{{ section.id }}" tabindex="0" hidden>
+            {%- if mf.care != blank -%}{{ mf.care | metafield_tag }}{%- else -%}{{ section.settings.care_default }}{%- endif -%}
+          </div>
+        {%- endif -%}
+        {%- if section.settings.delivery != blank -%}
+          <div class="wt-tabpanel wt-rte" role="tabpanel" id="panel-del-{{ section.id }}" aria-labelledby="tab-del-{{ section.id }}" tabindex="0" hidden>{{ section.settings.delivery }}</div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="wt-pdp__right">
+      <div class="wt-info">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'header' -%}
+              <div {{ block.shopify_attributes }}>
+                <div class="wt-info__top">
+                  <span class="wt-badge">{{ block.settings.badge | default: product.type }}</span>
+                  <div class="wt-info__actions">
+                    <button type="button" class="wt-iconbtn" aria-pressed="false" data-wt-wish="{{ product.handle }}">{% render 'wt-icon', icon: 'heart' %}<span class="wt-visually-hidden">Save to wishlist</span></button>
+                    <button type="button" class="wt-iconbtn" data-wt-share data-url="{{ shop.url }}{{ product.url }}" data-title="{{ product.title | escape }}">{% render 'wt-icon', icon: 'share' %}<span class="wt-visually-hidden">Share</span></button>
+                  </div>
+                </div>
+                <h1 class="wt-h1 wt-info__title" style="font-size:clamp(3rem,3vw,4.2rem)">{{ product.title }}</h1>
+                {%- if mf.tagline != blank -%}<p class="wt-info__tagline" style="margin-top:.8rem">{{ mf.tagline }}</p>{%- endif -%}
+              </div>
+            {%- when 'price' -%}
+              <div class="wt-info__pricerow" {{ block.shopify_attributes }}>
+                <div>
+                  {%- assign rating = product.metafields.reviews.rating.value | default: mf.rating.value -%}
+                  {%- assign rcount = product.metafields.reviews.rating_count.value | default: mf.rating_count.value -%}
+                  {%- if rating != blank -%}
+                    <div class="wt-rating" style="margin-bottom:1.2rem"><span class="wt-stars" role="img" aria-label="{{ rating.rating }} out of {{ rating.scale_max }} stars">{% for i in (1..5) %}{% render 'wt-icon', icon: 'star' %}{% endfor %}</span><strong>{{ rating.rating }}</strong>{% if rcount %} ({{ rcount }} reviews){% endif %}</div>
+                  {%- endif -%}
+                  <p class="wt-info__price" data-wt-price>{% render 'wt-price', product: product, variant: v %}</p>
+                </div>
+                {%- if block.settings.show_sample -%}
+                  {%- assign sp = mf.sample_product.value -%}
+                  {%- if sp -%}<a class="wt-sample" href="{{ sp.url }}">{%- else -%}<button type="button" class="wt-sample" data-wt-quote-open data-sample="true">{%- endif -%}
+                    <span class="wt-sample__img">{%- if product.featured_image -%}{{ product.featured_image | image_url: width: 160 | image_tag: width: 72, height: 52, alt: '', loading: 'lazy' }}{%- endif -%}</span>
+                    <span>{{ block.settings.sample_label }}{% render 'wt-icon', icon: 'arrow-right' %}</span>
+                  {%- if sp -%}</a>{%- else -%}</button>{%- endif -%}
+                {%- endif -%}
+              </div>
+            {%- when 'configurator' -%}
+              <form id="{{ fid }}" action="{{ routes.cart_add_url }}" method="post" class="wt-calc-form" novalidate data-wt-form {{ block.shopify_attributes }}>
+                <input type="hidden" name="id" value="{{ v.id }}" data-wt-variant-id>
+                <input type="hidden" name="quantity" value="1" data-wt-qty-hidden>
+                <div class="{% if mtm %}wt-calc{% endif %}">
+                  {%- if mtm -%}<h2 class="wt-calc__title">{{ block.settings.title }}</h2>{%- endif -%}
+                  {%- unless product.has_only_default_variant -%}
+                    <div class="wt-calc__opts">
+                      {%- for option in product.options_with_values -%}
+                        {%- assign oname = option.name | downcase -%}
+                        <fieldset class="wt-opt">
+                          <legend>{{ option.name }}{%- if oname contains 'thick' and block.settings.thickness_info != blank -%}<span title="{{ block.settings.thickness_info | escape }}">{% render 'wt-icon', icon: 'info' %}<span class="wt-visually-hidden">{{ block.settings.thickness_info }}</span></span>{%- elsif oname contains 'edge' and block.settings.edge_info != blank -%}<span title="{{ block.settings.edge_info | escape }}">{% render 'wt-icon', icon: 'info' %}<span class="wt-visually-hidden">{{ block.settings.edge_info }}</span></span>{%- endif -%}</legend>
+                          <div class="wt-opt__list">
+                            {%- for value in option.values -%}
+                              <label class="wt-opt__item">
+                                <input type="radio" name="wt-opt-{{ section.id }}-{{ option.position }}" value="{{ value | escape }}"{% if option.selected_value == value %} checked{% endif %} data-wt-option="{{ forloop.parentloop.index0 }}">
+                                {%- if oname contains 'edge' -%}
+                                  {%- assign eh = value | handleize -%}{%- assign eicon = 'edge-' | append: eh -%}
+                                  <span class="wt-opt__btn wt-opt__btn--icon">{% render 'wt-icon', icon: eicon %}{{ value }}</span>
+                                {%- else -%}
+                                  <span class="wt-opt__btn">{{ value }}</span>
+                                {%- endif -%}
+                              </label>
+                            {%- endfor -%}
+                          </div>
+                        </fieldset>
+                      {%- endfor -%}
+                    </div>
+                  {%- endunless -%}
+                  {%- if mtm -%}
+                    <div class="wt-dims">
+                      <div class="wt-field">
+                        <label class="wt-label" for="Len-{{ section.id }}">{{ block.settings.length_label }}</label>
+                        <input class="wt-input" id="Len-{{ section.id }}" type="number" inputmode="numeric" step="1" min="{{ min_l }}" max="{{ max_l }}" value="{{ block.settings.default_length }}" name="properties[Length (mm)]" required aria-describedby="Len-hint-{{ section.id }} Len-err-{{ section.id }}" data-wt-dim="length">
+                        <span class="wt-hint" id="Len-hint-{{ section.id }}">Min: {{ min_l }} mm&nbsp;&nbsp; Max: {{ max_l }} mm</span>
+                        <span class="wt-error" id="Len-err-{{ section.id }}" aria-live="polite"></span>
+                      </div>
+                      <span class="wt-dims__x" aria-hidden="true">&times;</span>
+                      <div class="wt-field">
+                        <label class="wt-label" for="Wid-{{ section.id }}">{{ block.settings.width_label }}</label>
+                        <input class="wt-input" id="Wid-{{ section.id }}" type="number" inputmode="numeric" step="1" min="{{ min_w }}" max="{{ max_w }}" value="{{ block.settings.default_width }}" name="properties[Width (mm)]" required aria-describedby="Wid-hint-{{ section.id }} Wid-err-{{ section.id }}" data-wt-dim="width">
+                        <span class="wt-hint" id="Wid-hint-{{ section.id }}">Min: {{ min_w }} mm&nbsp;&nbsp; Max: {{ max_w }} mm</span>
+                        <span class="wt-error" id="Wid-err-{{ section.id }}" aria-live="polite"></span>
+                      </div>
+                    </div>
+                    <input type="hidden" name="properties[Area (m²)]" value="" data-wt-area-prop>
+                  {%- else -%}
+                    <div class="wt-field" style="margin-top:1.6rem">
+                      <label class="wt-label" for="Qty-{{ section.id }}">{{ 'products.product.quantity.label' | t }}</label>
+                      <div class="wt-qty"><button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button><input id="Qty-{{ section.id }}" type="number" min="1" max="99" value="1" data-wt-qty><button type="button" data-step="1" aria-label="Increase quantity">+</button></div>
+                    </div>
+                  {%- endif -%}
+                </div>
+              </form>
+              {%- if mtm -%}
+                <div class="wt-summary" data-wt-summary aria-live="polite">
+                  <div class="wt-summary__row"><span>{{ block.settings.area_label }}</span><strong data-wt-out="area">&ndash;</strong></div>
+                  <div class="wt-summary__row"><span>{{ block.settings.ppm_label }}</span><strong data-wt-out="ppm">{{ v.price | times: 100 | money }}</strong></div>
+                  <div class="wt-summary__total"><span>{{ block.settings.total_label }} <small>{{ block.settings.total_note }}</small></span><output data-wt-out="total" form="{{ fid }}">&ndash;</output></div>
+                </div>
+              {%- endif -%}
+              <script type="application/json" data-wt-config>
+                {
+                  "mtm": {{ mtm | default: false | json }},
+                  "minL": {{ min_l | json }}, "maxL": {{ max_l | json }}, "minW": {{ min_w | json }}, "maxW": {{ max_w | json }},
+                  "currency": {{ cart.currency.iso_code | json }}, "locale": {{ request.locale.iso_code | json }},
+                  "variants": [{% for x in product.variants %}{"id": {{ x.id }}, "title": {{ x.title | json }}, "price": {{ x.price }}, "available": {{ x.available }}, "options": {{ x.options | json }}}{% unless forloop.last %},{% endunless %}{% endfor %}],
+                  "cartDrawer": {% if settings.cart_type == 'drawer' %}true{% else %}false{% endif %},
+                  "msgAdded": {{ block.settings.added_msg | json }}
+                }
+              </script>
+            {%- when 'buy_buttons' -%}
+              <div class="wt-buy" {{ block.shopify_attributes }}>
+                <button type="submit" form="{{ fid }}" class="wt-btn" data-wt-add{% unless v.available %} disabled{% endunless %}>{% render 'wt-icon', icon: 'cart' %}<span data-wt-add-label>{% if v.available %}{{ 'products.product.add_to_cart' | t }}{% else %}{{ 'products.product.sold_out' | t }}{% endif %}</span></button>
+                {%- if block.settings.show_quote -%}<button type="button" class="wt-btn wt-btn--outline" data-wt-quote-open aria-haspopup="dialog">{{ block.settings.quote_label }}</button>{%- endif -%}
+                <p class="wt-buy__msg" role="status" data-wt-msg></p>
+              </div>
+            {%- when 'assurance' -%}
+              <ul class="wt-assure" {{ block.shopify_attributes }}>
+                {%- for f in block.settings.features -%}<li>{% render 'wt-icon', icon: f.icon.value %}<strong>{{ f.title.value }}</strong>{%- if f.text.value != blank -%}<span>{{ f.text.value }}</span>{%- endif -%}</li>{%- endfor -%}
+              </ul>
+            {%- when 'text' -%}
+              <div class="wt-rte" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+
+  <dialog class="wt-dialog wt-quote__dialog" id="WtQuote-{{ section.id }}" aria-labelledby="WtQuoteForm-{{ section.id }}-title" data-wt-quote-dialog>
+    <div class="wt-dialog__inner">
+      {%- assign qid = 'WtQuoteForm-' | append: section.id -%}
+      {% render 'wt-quote-form', id: qid, product: product, heading: section.settings.quote_heading, intro: section.settings.quote_intro %}
+    </div>
+    <form method="dialog"><button class="wt-iconbtn wt-dialog__close">{% render 'wt-icon', icon: 'close' %}<span class="wt-visually-hidden">{{ 'accessibility.close' | t }}</span></button></form>
+  </dialog>
+</div>
+{% render 'wt-product-jsonld' %}
+{% schema %}
+{
+  "name": "WT Product",
+  "settings": [
+    { "type": "header", "content": "Made-to-measure size defaults" },
+    { "type": "number", "id": "min_length", "label": "Min length (mm)", "default": 300 },
+    { "type": "number", "id": "max_length", "label": "Max length (mm)", "default": 3200 },
+    { "type": "number", "id": "min_width", "label": "Min width (mm)", "default": 300 },
+    { "type": "number", "id": "max_width", "label": "Max width (mm)", "default": 1600 },
+    { "type": "header", "content": "Media column" },
+    { "type": "range", "id": "gallery_start", "label": "Gallery opens on image #", "min": 0, "max": 3, "step": 1, "default": 0, "info": "0 = first image (used on cards). 1 = second image, e.g. a kitchen shot." },
+    { "type": "checkbox", "id": "show_props", "label": "Show property icons", "default": true },
+    { "type": "metaobject_list", "id": "properties", "label": "Default property icons", "metaobject_type": "feature", "limit": 4 },
+    { "type": "text", "id": "tab_desc", "label": "Description tab", "default": "Description" },
+    { "type": "text", "id": "tab_spec", "label": "Specifications tab", "default": "Specifications" },
+    { "type": "text", "id": "tab_care", "label": "Care tab", "default": "Care & Maintenance" },
+    { "type": "text", "id": "tab_delivery", "label": "Delivery tab", "default": "Delivery" },
+    { "type": "textarea", "id": "features_default", "label": "Default key features (one per line)" },
+    { "type": "richtext", "id": "care_default", "label": "Default care text" },
+    { "type": "richtext", "id": "delivery", "label": "Delivery text", "default": "<p>Templating, fabrication and nationwide delivery in 7-10 working days. Professional installation available on request.</p>" },
+    { "type": "header", "content": "Quote form" },
+    { "type": "text", "id": "quote_heading", "label": "Heading", "default": "Request a Free Quote" },
+    { "type": "text", "id": "quote_intro", "label": "Intro", "default": "Send us your details and we'll reply with a clear, no-obligation quote." }
+  ],
+  "blocks": [
+    { "type": "header", "name": "Badge, title & tagline", "limit": 1, "settings": [ { "type": "text", "id": "badge", "label": "Badge (defaults to product type)" } ] },
+    { "type": "price", "name": "Rating, price & sample", "limit": 1, "settings": [
+      { "type": "checkbox", "id": "show_sample", "label": "Show free sample card", "default": true },
+      { "type": "text", "id": "sample_label", "label": "Sample label", "default": "Order a Free Sample" }
+    ] },
+    { "type": "configurator", "name": "Size calculator / options", "limit": 1, "settings": [
+      { "type": "text", "id": "title", "label": "Title", "default": "Made to Measure – Get an Instant Price" },
+      { "type": "text", "id": "thickness_info", "label": "Thickness tooltip", "default": "20 mm suits modern kitchens; 30 mm gives a solid, traditional look." },
+      { "type": "text", "id": "edge_info", "label": "Edge tooltip", "default": "The profile of the exposed front edge." },
+      { "type": "text", "id": "length_label", "label": "Length label", "default": "Length (mm)" },
+      { "type": "text", "id": "width_label", "label": "Width label", "default": "Width (mm)" },
+      { "type": "number", "id": "default_length", "label": "Default length", "default": 2400 },
+      { "type": "number", "id": "default_width", "label": "Default width", "default": 600 },
+      { "type": "text", "id": "area_label", "label": "Area label", "default": "Area" },
+      { "type": "text", "id": "ppm_label", "label": "Price per m² label", "default": "Price per m²" },
+      { "type": "text", "id": "total_label", "label": "Total label", "default": "Total Price" },
+      { "type": "text", "id": "total_note", "label": "Total note", "default": "(incl. VAT)" },
+      { "type": "text", "id": "added_msg", "label": "Added message", "default": "Added to your cart." }
+    ] },
+    { "type": "buy_buttons", "name": "Buy buttons", "limit": 1, "settings": [
+      { "type": "checkbox", "id": "show_quote", "label": "Show quote button", "default": true },
+      { "type": "text", "id": "quote_label", "label": "Quote button label", "default": "Request a Free Quote" }
+    ] },
+    { "type": "assurance", "name": "Assurance icons", "limit": 1, "settings": [ { "type": "metaobject_list", "id": "features", "label": "Features", "metaobject_type": "feature", "limit": 3 } ] },
+    { "type": "text", "name": "Text", "settings": [ { "type": "richtext", "id": "text", "label": "Text" } ] }
+  ]
+}
+{% endschema %}

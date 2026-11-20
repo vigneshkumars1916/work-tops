@@ -1,0 +1,58 @@
+{%- doc -%}
+  Reusable "Request a free quote" form (Shopify contact form).
+  Prefills product, variant and dimensions; JS keeps them in sync with the calculator.
+  Spam protection: honeypot field + minimum fill time (client) and Shopify's built-in hCaptcha (server).
+  @param {string} id - unique form id
+  @param {product} [product]
+  @param {string} [heading]
+  @param {string} [intro]
+  @param {string} [button]
+{%- enddoc -%}
+{%- assign v = product.selected_or_first_available_variant -%}
+{%- form 'contact', id: id, class: 'wt-quote', data-wt-quote: '' -%}
+  {%- if heading != blank -%}<h2 class="wt-h3" id="{{ id }}-title">{{ heading }}</h2>{%- endif -%}
+  {%- if intro != blank -%}<p class="wt-muted" style="margin:0">{{ intro }}</p>{%- endif -%}
+  {%- if form.posted_successfully? -%}
+    <p class="wt-quote__ok" role="status" data-wt-quote-ok>{% render 'wt-icon', icon: 'check-circle' %}Thanks! Your quote request has been sent. We'll reply within one working day.</p>
+  {%- elsif form.errors -%}
+    <div class="wt-error" role="alert">{{ form.errors | default_errors }}</div>
+  {%- endif -%}
+  <input type="hidden" name="contact[subject]" value="Quote request{% if product %}: {{ product.title | escape }}{% endif %}">
+  {%- if product -%}
+    <input type="hidden" name="contact[Product]" value="{{ product.title | escape }}" data-q="product">
+    <input type="hidden" name="contact[Product URL]" value="{{ shop.url }}{{ product.url }}">
+    <input type="hidden" name="contact[Variant]" value="{{ v.title | escape }}" data-q="variant">
+    <input type="hidden" name="contact[Dimensions]" value="" data-q="dims">
+    <p class="wt-quote__summary" data-q="summary">{{ product.title }} &middot; {{ v.title }}</p>
+  {%- endif -%}
+  <div class="wt-quote__grid">
+    <div class="wt-field">
+      <label class="wt-label" for="{{ id }}-name">Name <span aria-hidden="true">*</span></label>
+      <input class="wt-input" id="{{ id }}-name" type="text" name="contact[name]" autocomplete="name" required maxlength="100">
+    </div>
+    <div class="wt-field">
+      <label class="wt-label" for="{{ id }}-email">Email <span aria-hidden="true">*</span></label>
+      <input class="wt-input" id="{{ id }}-email" type="email" name="contact[email]" autocomplete="email" required maxlength="150">
+    </div>
+    <div class="wt-field">
+      <label class="wt-label" for="{{ id }}-postcode">Postcode <span aria-hidden="true">*</span></label>
+      <input class="wt-input" id="{{ id }}-postcode" type="text" name="contact[Postcode]" autocomplete="postal-code" required maxlength="12" pattern="[A-Za-z0-9 \-]{3,12}" aria-describedby="{{ id }}-postcode-hint">
+      <span class="wt-hint" id="{{ id }}-postcode-hint">Used to check delivery and installation.</span>
+    </div>
+    <div class="wt-field">
+      <label class="wt-label" for="{{ id }}-phone">Phone (optional)</label>
+      <input class="wt-input" id="{{ id }}-phone" type="tel" name="contact[phone]" autocomplete="tel" maxlength="20">
+    </div>
+  </div>
+  <div class="wt-field">
+    <label class="wt-label" for="{{ id }}-notes">Notes</label>
+    <textarea class="wt-textarea" id="{{ id }}-notes" name="contact[body]" maxlength="2000" placeholder="Cut-outs, upstands, installation, timescales..." data-q="notes"></textarea>
+  </div>
+  <div class="wt-hp" aria-hidden="true">
+    <label for="{{ id }}-website">Leave this field empty</label>
+    <input id="{{ id }}-website" type="text" name="contact[website]" tabindex="-1" autocomplete="off" data-q="hp">
+  </div>
+  <input type="hidden" value="" data-q="ts" disabled>
+  <p class="wt-error" role="alert" data-q="error"></p>
+  <button type="submit" class="wt-btn wt-btn--block">{{ button | default: 'Send quote request' }}</button>
+{%- endform -%}
