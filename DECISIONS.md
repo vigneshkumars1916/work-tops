@@ -73,6 +73,8 @@ Tags remain where they're strongest: automated collection conditions (`material:
 | Two or more filters, price/availability, non-default sort, tag URLs | noindex, follow | clean collection URL |
 | Search, cart | noindex, follow | — |
 
+**Titles and descriptions (`snippets/wt-meta.liquid`).** The SEO fields in the admin always win. Products without them get a pattern title and a description built from real data (tagline, thickness options). An indexable single-filter collection URL gets a matching title and description, so the pages allowed into the index aren't duplicates of the main collection.
+
 This lets a few high-intent landing pages rank without letting thousands of filter combinations dilute the collection.
 
 ## 5. Performance
@@ -81,12 +83,14 @@ This lets a few high-intent landing pages rank without letting thousands of filt
 - The LCP image (hero or first product image) is `loading=eager fetchpriority=high`. Everything else is lazy-loaded with `decoding=async`.
 - Section-scoped CSS and deferred JS, and no third-party libraries.
 - Dawn scripts the new header doesn't need are no longer loaded on every page. Predictive search is off.
+- Carousels (products, reviews, blog) share one scroll-snap custom element (`wt-carousel`). Native scrolling handles touch and momentum; the arrows are overlaid so they never take layout space. The 45 reviews are server-rendered for crawlers and screen readers, but only one is visible at a time.
 - Fonts use `font-display: swap`. Only the weights in use are loaded (Playfair Display 400/500, DM Sans 400/500/600/700).
 
 ## 6. Accessibility
 
 - **Mega menu:** top-level items with children are `<button aria-expanded aria-controls>`. Click and tap toggle; hover only opens on `(hover: hover) and (pointer: fine)`. ArrowDown moves into the panel, Left/Right move between items, Escape closes and returns focus, and focus leaving an item closes it. Below 1080 px the menu becomes a drawer with a focus trap, so it never overlaps the logo or icons at mid widths.
 - **FAQ accordion:** buttons inside headings, `aria-expanded`/`aria-controls`, panels with `role=region` + `aria-labelledby`, Up/Down/Home/End navigation, and panels hidden with the `hidden` attribute.
+- **Carousels:** a focusable, labelled list per carousel, real buttons for previous/next (disabled at the ends), a polite live "n / total" status on the reviews slider, and `prefers-reduced-motion` respected.
 - **Product tabs:** WAI-ARIA tabs pattern with roving `tabindex` and arrow-key navigation.
 - **Forms:** visible labels, `aria-describedby` hints and errors, `aria-invalid`, and live regions for the price summary and filter result count.
 
