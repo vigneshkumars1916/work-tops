@@ -1,0 +1,41 @@
+{{ 'wt-product.css' | asset_url | stylesheet_tag }}
+<section class="wt-section" style="--wt-pt: .75; --wt-pb: 1;">
+  <div class="wt-container" style="display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(3.2rem,5vw,8rem);align-items:start">
+    <div>
+      {%- if section.settings.eyebrow != blank -%}<p class="wt-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h1 class="wt-h1">{{ section.settings.heading | default: page.title }}</h1>
+      <div class="wt-lead wt-rte" style="margin-top:1.6rem">{{ section.settings.text | default: page.content }}</div>
+      {%- if section.settings.points.count > 0 -%}<ul class="wt-checklist">{% for f in section.settings.points %}<li>{% render 'wt-icon', icon: 'check-circle' %}{{ f.title.value }}{% if f.text.value != blank %} &ndash; {{ f.text.value }}{% endif %}</li>{% endfor %}</ul>{%- endif -%}
+    </div>
+    <div style="background:#fff;border:1px solid var(--wt-line);border-radius:var(--wt-radius);padding:clamp(2.4rem,3vw,4rem)">
+      {%- assign pid = 'WtQuotePage-' | append: section.id -%}
+      {% render 'wt-quote-form', id: pid, heading: section.settings.form_heading %}
+    </div>
+  </div>
+</section>
+<script>
+  (() => {
+    const f = document.getElementById('WtQuotePage-{{ section.id }}');
+    if (!f) return;
+    const t0 = Date.now();
+    f.addEventListener('submit', (e) => {
+      const err = f.querySelector('[data-q=error]');
+      if (f.querySelector('[data-q=hp]').value) { e.preventDefault(); return; }
+      if (Date.now() - t0 < 2500) { e.preventDefault(); err.textContent = 'Please take a moment to check your details, then send again.'; }
+    });
+  })();
+</script>
+<style>@media (max-width:899px){.wt-section>.wt-container[style*="grid"]{grid-template-columns:1fr!important}}</style>
+{% schema %}
+{
+  "name": "WT Quote form",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Free, no-obligation" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "richtext", "id": "text", "label": "Text" },
+    { "type": "metaobject_list", "id": "points", "label": "Reassurance points", "metaobject_type": "feature", "limit": 4 },
+    { "type": "text", "id": "form_heading", "label": "Form heading", "default": "Tell us about your project" }
+  ],
+  "presets": [{ "name": "WT Quote form" }]
+}
+{% endschema %}

@@ -1,0 +1,36 @@
+<section class="wt-section" style="--wt-pt: {{ section.settings.pt | divided_by: 100.0 }}; --wt-pb: {{ section.settings.pb | divided_by: 100.0 }};">
+  <div class="wt-container">
+    <ul class="wt-stats" role="list">
+      {%- for block in section.blocks -%}
+        <li class="wt-stat" {{ block.shopify_attributes }}>{% render 'wt-icon', icon: block.settings.icon %}<div><strong>{{ block.settings.number }}</strong><span>{{ block.settings.label }}</span></div></li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+<style>
+  .wt-stats{display:grid;grid-template-columns:repeat({{ section.blocks.size | at_least: 1 }},minmax(0,1fr));list-style:none;margin:0;padding:2.8rem 1.6rem;background:var(--wt-surface);border-radius:var(--wt-radius)}
+  .wt-stat{display:flex;align-items:center;justify-content:center;gap:1.6rem;padding:.4rem 1.6rem}
+  .wt-stat+.wt-stat{border-left:1px solid var(--wt-line)}
+  .wt-stat .wt-icon{width:3.4rem;height:3.4rem;color:var(--wt-ink);flex-shrink:0}
+  .wt-stat strong{display:block;font:600 2.4rem/1.15 var(--wt-sans);color:var(--wt-ink)}
+  .wt-stat span{font-size:1.45rem;color:var(--wt-text)}
+  @media (max-width:899px){.wt-stats{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:2.4rem}.wt-stat{justify-content:flex-start}.wt-stat:nth-child(odd){border-left:0}}
+</style>
+{% schema %}
+{
+  "name": "WT Stats bar",
+  "settings": [
+    { "type": "range", "id": "pt", "label": "Top spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 0 },
+    { "type": "range", "id": "pb", "label": "Bottom spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 50 }
+  ],
+  "blocks": [
+    { "type": "stat", "name": "Stat", "settings": [
+      { "type": "select", "id": "icon", "label": "Icon", "default": "users", "options": [{ "value": "users", "label": "People" }, { "value": "layers", "label": "Layers" }, { "value": "pin", "label": "Pin" }, { "value": "shield", "label": "Shield" }, { "value": "truck", "label": "Truck" }, { "value": "star", "label": "Star" }] },
+      { "type": "text", "id": "number", "label": "Number / heading", "default": "1,200+" },
+      { "type": "text", "id": "label", "label": "Label", "default": "Happy Customers" }
+    ] }
+  ],
+  "max_blocks": 5,
+  "presets": [{ "name": "WT Stats bar", "blocks": [{ "type": "stat" }, { "type": "stat" }] }]
+}
+{% endschema %}

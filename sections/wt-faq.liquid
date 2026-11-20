@@ -1,0 +1,82 @@
+{%- comment -%}
+  Accessible FAQ accordion: real <button>s with aria-expanded/aria-controls,
+  regions labelled by their button, Enter/Space native, Up/Down/Home/End move between questions.
+  Panels are hidden with the hidden attribute (no display:none hacks, no layout shift on load).
+{%- endcomment -%}
+<section class="wt-section" style="--wt-pt: {{ section.settings.pt | divided_by: 100.0 }}; --wt-pb: {{ section.settings.pb | divided_by: 100.0 }};">
+  <div class="wt-container wt-faq">
+    <div class="wt-faq__head">
+      {%- if section.settings.eyebrow != blank -%}<p class="wt-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      {%- if section.settings.heading_tag == 'h1' -%}<h1 class="wt-h1">{{ section.settings.heading }}</h1>{%- else -%}<h2 class="wt-h2">{{ section.settings.heading }}</h2>{%- endif -%}
+      {%- if section.settings.text != blank -%}<div class="wt-lead wt-rte">{{ section.settings.text }}</div>{%- endif -%}
+    </div>
+    <div class="wt-acc" data-wt-acc>
+      {%- for block in section.blocks -%}
+        <div class="wt-acc__item" {{ block.shopify_attributes }}>
+          <h3 class="wt-acc__h">
+            <button type="button" class="wt-acc__btn" id="faq-q-{{ block.id }}" aria-expanded="{% if forloop.first and section.settings.open_first %}true{% else %}false{% endif %}" aria-controls="faq-a-{{ block.id }}">
+              <span>{{ block.settings.question }}</span>{% render 'wt-icon', icon: 'chevron-down' %}
+            </button>
+          </h3>
+          <div class="wt-acc__panel wt-rte" id="faq-a-{{ block.id }}" role="region" aria-labelledby="faq-q-{{ block.id }}"{% unless forloop.first and section.settings.open_first %} hidden{% endunless %}>{{ block.settings.answer }}</div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+<script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+  {%- for block in section.blocks -%}{ "@type": "Question", "name": {{ block.settings.question | json }}, "acceptedAnswer": { "@type": "Answer", "text": {{ block.settings.answer | strip_html | json }} } }{% unless forloop.last %},{% endunless %}{%- endfor -%}
+] }
+</script>
+<script>
+  (() => {
+    const acc = document.currentScript.previousElementSibling.previousElementSibling.querySelector('[data-wt-acc]');
+    const btns = [...acc.querySelectorAll('.wt-acc__btn')];
+    btns.forEach((b, i) => {
+      b.addEventListener('click', () => {
+        const open = b.getAttribute('aria-expanded') === 'true';
+        b.setAttribute('aria-expanded', String(!open));
+        document.getElementById(b.getAttribute('aria-controls')).hidden = open;
+      });
+      b.addEventListener('keydown', (e) => {
+        const map = { ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: btns.length - 1 };
+        if (e.key in map) { e.preventDefault(); btns[(map[e.key] + btns.length) % btns.length].focus(); }
+      });
+    });
+  })();
+</script>
+<style>
+  .wt-faq{display:grid;grid-template-columns:1fr 1.6fr;gap:clamp(3.2rem,5vw,8rem);align-items:start}
+  .wt-faq__head .wt-lead{margin-top:1.6rem}
+  .wt-acc__item{border-bottom:1px solid var(--wt-line)}
+  .wt-acc__item:first-child{border-top:1px solid var(--wt-line)}
+  .wt-acc__h{margin:0}
+  .wt-acc__btn{display:flex;width:100%;align-items:center;justify-content:space-between;gap:2rem;padding:2.2rem 0;background:none;border:0;text-align:left;cursor:pointer;font:600 1.75rem/1.4 var(--wt-sans);color:var(--wt-ink)}
+  .wt-acc__btn:focus-visible{outline:2px solid var(--wt-accent);outline-offset:2px}
+  .wt-acc__btn .wt-icon{flex-shrink:0;transition:transform .2s}
+  .wt-acc__btn[aria-expanded=true] .wt-icon{transform:rotate(180deg)}
+  .wt-acc__panel{padding:0 4rem 2.4rem 0;color:var(--wt-text);font-size:1.6rem;line-height:1.7}
+  @media (max-width:899px){.wt-faq{grid-template-columns:1fr}}
+</style>
+{% schema %}
+{
+  "name": "WT FAQ",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Help centre" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Frequently Asked Questions" },
+    { "type": "select", "id": "heading_tag", "label": "Heading tag", "options": [{ "value": "h1", "label": "H1" }, { "value": "h2", "label": "H2" }], "default": "h2" },
+    { "type": "richtext", "id": "text", "label": "Intro" },
+    { "type": "checkbox", "id": "open_first", "label": "Open first question", "default": true },
+    { "type": "range", "id": "pt", "label": "Top spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 75 },
+    { "type": "range", "id": "pb", "label": "Bottom spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 100 }
+  ],
+  "blocks": [
+    { "type": "faq", "name": "Question", "settings": [
+      { "type": "text", "id": "question", "label": "Question", "default": "How long does delivery take?" },
+      { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Most made-to-measure worktops are templated, cut and delivered within 7-10 working days.</p>" }
+    ] }
+  ],
+  "presets": [{ "name": "WT FAQ", "blocks": [{ "type": "faq" }] }]
+}
+{% endschema %}

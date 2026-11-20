@@ -1,0 +1,83 @@
+{
+  "sections": {
+    "faq": {
+      "type": "wt-faq",
+      "blocks": {
+        "q1": {
+          "type": "faq",
+          "settings": {
+            "question": "How do I measure for a made-to-measure worktop?",
+            "answer": "<p>Measure the length along the wall and the depth from the wall to the front edge in millimetres. Add any overhang you want. If you're unsure, request a free quote and we'll template on site.</p>"
+          }
+        },
+        "q2": {
+          "type": "faq",
+          "settings": {
+            "question": "What is the maximum size you can cut?",
+            "answer": "<p>Up to 3200 x 1600 mm from a single slab. Larger runs are joined with a near-invisible seam.</p>"
+          }
+        },
+        "q3": {
+          "type": "faq",
+          "settings": {
+            "question": "Which thickness should I choose?",
+            "answer": "<p>20 mm suits sleek, modern kitchens. 30 mm gives a solid, traditional look and is ideal for long unsupported spans.</p>"
+          }
+        },
+        "q4": {
+          "type": "faq",
+          "settings": {
+            "question": "How long does delivery take?",
+            "answer": "<p>Most made-to-measure worktops are cut and delivered within 7-10 working days.</p>"
+          }
+        },
+        "q5": {
+          "type": "faq",
+          "settings": {
+            "question": "Do you offer installation?",
+            "answer": "<p>Yes. Our professional fitting teams cover the whole of the UK. Ask for installation in your quote request.</p>"
+          }
+        },
+        "q6": {
+          "type": "faq",
+          "settings": {
+            "question": "Can I order a sample first?",
+            "answer": "<p>Absolutely. Use \"Order a Free Sample\" on any worktop page and we'll post one to you.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "q5",
+        "q6"
+      ],
+      "settings": {
+        "eyebrow": "Help centre",
+        "heading": "Frequently Asked Questions",
+        "heading_tag": "h1",
+        "open_first": true
+      }
+    },
+    "cta": {
+      "type": "wt-cta-banner",
+      "settings": {
+        "heading": "Still have a question?",
+        "text": "Our UK-based team is happy to help.",
+        "btn1_label": "Request a Free Quote",
+        "btn1_link": "shopify://pages/request-a-quote",
+        "btn2_label": "Contact Us",
+        "btn2_link": "shopify://pages/contact",
+        "pt": 0,
+        "pb": 75,
+        "bg": "shopify://shop_images/photo-1747696766706-5485b39bf358.jpg"
+      }
+    }
+  },
+  "order": [
+    "faq",
+    "cta"
+  ]
+}

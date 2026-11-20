@@ -1,0 +1,6 @@
+{
+  "sections": {
+    "quote": { "type": "wt-quote-section", "settings": { "eyebrow": "Free, no-obligation", "points": ["premium-quality", "custom-sizes", "uk-wide-delivery", "10-year-warranty"], "form_heading": "Tell us about your project" } }
+  },
+  "order": ["quote"]
+}

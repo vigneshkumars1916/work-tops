@@ -1,0 +1,204 @@
+{
+  "sections": {
+    "hero": {
+      "type": "wt-hero",
+      "blocks": {
+        "s1": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/photo-1783125126954-d9075ecff5ff.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "s1"
+      ],
+      "settings": {
+        "eyebrow": "About us",
+        "heading": "About Work-Tops",
+        "heading_tag": "h1",
+        "text": "<p>Specialists in premium stone worktops, made to measure for homes and businesses across the UK.</p>",
+        "btn1_label": "Our Story",
+        "btn1_link": "#our-story",
+        "btn2_label": "Request a Free Quote",
+        "btn2_link": "shopify://pages/request-a-quote",
+        "height": 430,
+        "image_width": 62,
+        "autoplay": false
+      }
+    },
+    "story": {
+      "type": "wt-image-text",
+      "blocks": {
+        "e": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Our story"
+          }
+        },
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Crafted in Stone,\nBuilt on Trust"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Work-Tops was founded with a simple goal — to make high-quality, custom stone worktops accessible, reliable and hassle-free. What started as a passion for beautiful, durable surfaces has grown into a trusted UK supplier for homes, renovations and commercial projects.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "e",
+        "h",
+        "t"
+      ],
+      "settings": {
+        "style": "card",
+        "image_right": false,
+        "pt": 30,
+        "pb": 30,
+        "anchor": "our-story",
+        "image": "shopify://shop_images/photo-1762529716215-afd7400d7bd4.jpg"
+      }
+    },
+    "stats": {
+      "type": "wt-stats",
+      "blocks": {
+        "a": {
+          "type": "stat",
+          "settings": {
+            "icon": "users",
+            "number": "1,200+",
+            "label": "Happy Customers"
+          }
+        },
+        "b": {
+          "type": "stat",
+          "settings": {
+            "icon": "layers",
+            "number": "15+",
+            "label": "Stone Materials"
+          }
+        },
+        "c": {
+          "type": "stat",
+          "settings": {
+            "icon": "pin",
+            "number": "UK Wide",
+            "label": "Delivery & Installation"
+          }
+        },
+        "d": {
+          "type": "stat",
+          "settings": {
+            "icon": "shield",
+            "number": "10-Year",
+            "label": "Warranty"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "settings": {
+        "pt": 0,
+        "pb": 50
+      }
+    },
+    "values": {
+      "type": "wt-values",
+      "settings": {
+        "heading": "Our Values",
+        "subheading": "The principles that guide everything we do.",
+        "values": [
+          "quality-first",
+          "made-to-measure",
+          "customer-focused",
+          "sustainable-choice"
+        ],
+        "pt": 25,
+        "pb": 75
+      }
+    },
+    "craft": {
+      "type": "wt-image-text",
+      "blocks": {
+        "e": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Behind the worktops"
+          }
+        },
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Expertise, Precision\nand Care"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From sourcing the finest stone to precision fabrication and professional installation, our experienced team ensures every worktop meets the highest standards of quality and finish.</p>"
+          }
+        },
+        "c1": {
+          "type": "check",
+          "settings": {
+            "text": "Expert craftsmanship"
+          }
+        },
+        "c2": {
+          "type": "check",
+          "settings": {
+            "text": "State-of-the-art fabrication"
+          }
+        },
+        "c3": {
+          "type": "check",
+          "settings": {
+            "text": "Professional UK installation"
+          }
+        }
+      },
+      "block_order": [
+        "e",
+        "h",
+        "t",
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "settings": {
+        "style": "bleed",
+        "image_right": false,
+        "pt": 0,
+        "pb": 0,
+        "image": "shopify://shop_images/photo-1559527530-dedb553c65c7.jpg"
+      }
+    },
+    "cta": {
+      "type": "wt-cta-banner",
+      "settings": {
+        "heading": "Ready to Create Your Perfect Worktop?",
+        "btn1_link": "shopify://pages/request-a-quote",
+        "btn2_link": "shopify://pages/contact",
+        "pt": 25,
+        "pb": 75,
+        "bg": "shopify://shop_images/photo-1747696766706-5485b39bf358.jpg"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "story",
+    "stats",
+    "values",
+    "craft",
+    "cta"
+  ]
+}
