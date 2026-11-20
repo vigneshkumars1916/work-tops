@@ -1,24 +1,44 @@
 {{ 'wt-home.css' | asset_url | stylesheet_tag }}
+{{ 'wt-carousel.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'wt-carousel.js' | asset_url }}" defer></script>
 {%- assign t = section.settings.testimonial -%}
 <section class="wt-ts" aria-label="{{ section.settings.aria_label | escape }}">
   <div class="wt-ts__bg" aria-hidden="true">
     {%- if section.settings.bg != blank -%}{{ section.settings.bg | image_url: width: 1920 | image_tag: loading: 'lazy', widths: '750, 1200, 1920', sizes: '100vw', alt: '' }}{%- endif -%}
   </div>
   <div class="wt-container wt-ts__inner">
-    {%- if t != blank -%}
-      <figure class="wt-ts__quote" style="margin:0">
+    {%- liquid
+      assign total = 0
+      if t != blank
+        assign total = 1
+      endif
+      for r in shop.metaobjects.testimonial.values limit: section.settings.max
+        unless t != blank and r.system.handle == t.system.handle
+          assign total = total | plus: 1
+        endunless
+      endfor
+    -%}
+    {%- if total > 0 -%}
+      <div class="wt-ts__quote">
         {% render 'wt-icon', icon: 'quote' %}
-        <div>
-          <blockquote class="wt-ts__q" style="margin:0">&ldquo;{{ t.quote.value }}&rdquo;</blockquote>
-          <figcaption class="wt-ts__by">&mdash; {{ t.author.value }}
-            {%- if t.rating.value != blank -%}
-              <span class="wt-stars" role="img" aria-label="{{ t.rating.value }} out of 5 stars">{% for i in (1..t.rating.value) %}{% render 'wt-icon', icon: 'star' %}{% endfor %}</span>
-            {%- endif -%}
-          </figcaption>
-        </div>
-      </figure>
-    {%- else -%}
-      <p>Select a testimonial (metaobject) in the theme editor.</p>
+        <wt-carousel class="wt-ts__slider">
+          <ul class="wt-car__track wt-car__track--single" data-track role="list" tabindex="0" aria-label="{{ section.settings.aria_label | escape }}">
+            {%- if t != blank -%}{%- render 'wt-review', review: t -%}{%- endif -%}
+            {%- for r in shop.metaobjects.testimonial.values limit: section.settings.max -%}
+              {%- if t != blank and r.system.handle == t.system.handle -%}{%- continue -%}{%- endif -%}
+              {%- render 'wt-review', review: r -%}
+            {%- endfor -%}
+          </ul>
+          {%- if total > 1 -%}
+            <div class="wt-car__nav wt-car__nav--inline">
+              <button type="button" class="wt-car__btn" data-prev aria-label="Previous review">{% render 'wt-icon', icon: 'chevron-left' %}</button>
+              <span class="wt-car__status" data-status aria-live="polite">1 / {{ total }}</span>
+              <button type="button" class="wt-car__btn" data-next aria-label="Next review">{% render 'wt-icon', icon: 'chevron-right' %}</button>
+              {%- if section.settings.note != blank -%}<span class="wt-ts__note">{{ section.settings.note }}</span>{%- endif -%}
+            </div>
+          {%- endif -%}
+        </wt-carousel>
+      </div>
     {%- endif -%}
     <ul class="wt-ts__stats">
       {%- for block in section.blocks -%}
@@ -31,7 +51,9 @@
 {
   "name": "WT Testimonial + stats",
   "settings": [
-    { "type": "metaobject", "id": "testimonial", "label": "Testimonial", "metaobject_type": "testimonial" },
+    { "type": "metaobject", "id": "testimonial", "label": "Featured testimonial (shown first)", "metaobject_type": "testimonial" },
+    { "type": "range", "id": "max", "label": "Reviews in the slider", "min": 1, "max": 50, "step": 1, "default": 50, "info": "All testimonial entries (Content → Metaobjects) are shown, up to this number." },
+    { "type": "text", "id": "note", "label": "Note under the reviews", "default": "Sample reviews for demonstration" },
     { "type": "image_picker", "id": "bg", "label": "Background texture" },
     { "type": "text", "id": "aria_label", "label": "Accessible label", "default": "What our customers say" }
   ],

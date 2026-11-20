@@ -1,0 +1,38 @@
+{{ 'wt-carousel.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'wt-carousel.js' | asset_url }}" defer></script>
+{%- assign c = section.settings.collection -%}
+<section class="wt-section" style="--wt-pt: {{ section.settings.pt | divided_by: 100.0 }}; --wt-pb: {{ section.settings.pb | divided_by: 100.0 }};">
+  <div class="wt-container">
+    {% render 'wt-section-head', eyebrow: section.settings.eyebrow, heading: section.settings.heading, link_label: section.settings.link_label, link_url: c.url %}
+    <wt-carousel style="--nav-top: 28%">
+      <ul class="wt-car__track" data-track role="list" tabindex="0" aria-label="{{ section.settings.heading | escape }}">
+        {%- for product in c.products limit: section.settings.count -%}
+          <li>{% render 'wt-product-card', product: product, sizes: '(min-width: 1200px) 300px, (min-width: 990px) 24vw, (min-width: 541px) 46vw, 82vw' %}</li>
+        {%- else -%}
+          {%- for i in (1..4) -%}
+            <li><article class="wt-card"><div class="wt-card__media">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div><div class="wt-card__body"><h3 class="wt-card__title">Product title</h3></div></article></li>
+          {%- endfor -%}
+        {%- endfor -%}
+      </ul>
+      <div class="wt-car__nav">
+        <button type="button" class="wt-car__btn" data-prev aria-label="Previous products">{% render 'wt-icon', icon: 'chevron-left' %}</button>
+        <button type="button" class="wt-car__btn" data-next aria-label="Next products">{% render 'wt-icon', icon: 'chevron-right' %}</button>
+      </div>
+    </wt-carousel>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "WT Product carousel",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "count", "label": "Products", "min": 4, "max": 16, "step": 1, "default": 12 },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Customer favourites" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Popular Worktops" },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "View All Worktops" },
+    { "type": "range", "id": "pt", "label": "Top spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 75 },
+    { "type": "range", "id": "pb", "label": "Bottom spacing", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 75 }
+  ],
+  "presets": [{ "name": "WT Product carousel" }]
+}
+{% endschema %}

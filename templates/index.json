@@ -253,12 +253,24 @@
       "type": "wt-blog-grid",
       "settings": {
         "blog": "blog",
-        "count": 4,
+        "count": 8,
         "eyebrow": "Inspiration & guides",
         "heading": "Ideas for Your Next Project",
         "link_label": "View All Articles",
         "pt": 75,
         "pb": 100
+      }
+    },
+    "popular": {
+      "type": "wt-product-carousel",
+      "settings": {
+        "collection": "worktops",
+        "count": 12,
+        "eyebrow": "Customer favourites",
+        "heading": "Popular Worktops",
+        "link_label": "View All Worktops",
+        "pt": 75,
+        "pb": 75
       }
     }
   },
@@ -268,6 +280,7 @@
     "custom",
     "promo",
     "usps",
+    "popular",
     "testimonial",
     "blog"
   ]

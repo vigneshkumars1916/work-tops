@@ -1,0 +1,14 @@
+{%- doc -%}
+  One testimonial slide.
+  @param {metaobject} review - testimonial metaobject (quote, author, rating)
+{%- enddoc -%}
+<li>
+  <figure class="wt-ts__fig">
+    <blockquote class="wt-ts__q">&ldquo;{{ review.quote.value }}&rdquo;</blockquote>
+    <figcaption class="wt-ts__by">&mdash; {{ review.author.value }}
+      {%- if review.rating.value != blank -%}
+        <span class="wt-stars" role="img" aria-label="{{ review.rating.value }} out of 5 stars">{% for i in (1..review.rating.value) %}{% render 'wt-icon', icon: 'star' %}{% endfor %}</span>
+      {%- endif -%}
+    </figcaption>
+  </figure>
+</li>

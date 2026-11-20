@@ -1,0 +1,22 @@
+wt-carousel{display:block;position:relative}
+.wt-car__track{--gap:2rem;--per:calc((100% - 3 * var(--gap)) / 4);display:grid;grid-auto-flow:column;grid-auto-columns:var(--per);gap:var(--gap);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;list-style:none;margin:0;padding:0}
+.wt-car__track::-webkit-scrollbar{display:none}
+.wt-car__track>*{scroll-snap-align:start;min-width:0}
+.wt-car__track:focus-visible{outline:2px solid var(--wt-accent);outline-offset:4px}
+@media (max-width:989px){.wt-car__track{--per:calc((100% - var(--gap)) / 2.15)}}
+@media (max-width:540px){.wt-car__track{--per:82%}}
+.wt-car__track.wt-car__track--single{--per:100%}
+
+/* Overlay arrows: take no layout space, so showing or hiding them never shifts content */
+.wt-car__nav{position:absolute;left:0;right:0;top:var(--nav-top,40%);display:flex;justify-content:space-between;margin-inline:-1.6rem;pointer-events:none}
+.wt-car__btn{display:inline-grid;place-items:center;width:4.4rem;height:4.4rem;border-radius:50%;border:1px solid var(--wt-line);background:#fff;color:var(--wt-ink);cursor:pointer;pointer-events:auto;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.wt-car__btn:disabled{opacity:0;pointer-events:none}
+.wt-car__btn:focus-visible{outline:2px solid var(--wt-accent);outline-offset:2px}
+wt-carousel[data-static] .wt-car__nav{display:none}
+@media (max-width:749px){.wt-car__nav{margin-inline:-.4rem}}
+
+/* Inline controls (used by the reviews slider) */
+.wt-car__nav--inline{position:static;margin:1.6rem 0 0;justify-content:flex-start;align-items:center;gap:1.2rem;pointer-events:auto}
+.wt-car__nav--inline .wt-car__btn{width:3.6rem;height:3.6rem;background:transparent;color:inherit;border-color:rgba(255,255,255,.45);box-shadow:none}
+.wt-car__nav--inline .wt-car__btn:disabled{opacity:.35}
+.wt-car__status{font-size:1.3rem;min-width:7ch;font-variant-numeric:tabular-nums}
